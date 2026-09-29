@@ -13,6 +13,16 @@ Installable sur l'écran d'accueil et **utilisable sans réseau** une fois ouver
 
 Détail des réglages : [[docs/Protocoles|Protocoles]] · Historique : [[docs/Journal|Journal]]
 
+**Version 1.0** — première version partagée avec les apnéistes du club.
+
+## Installer sur son téléphone
+
+1. Ouvrir **https://paquito-app.github.io/Apnee-training/** dans **Safari** (iPhone) ou **Chrome** (Android).
+2. iPhone : bouton Partager → **« Sur l'écran d'accueil »**. Android : menu ⋮ → **« Installer l'application »**.
+3. Lancer l'app depuis son icône. Elle fonctionne ensuite **sans réseau**, et se met à jour toute seule quand une nouvelle version sort (numéro affiché en haut).
+
+Les séances et le record restent sur le téléphone de chacun : rien n'est envoyé ni partagé.
+
 ## Utilisation
 
 **En ligne : https://paquito-app.github.io/Apnee-training/**. Sur iPhone, l'ouvrir dans Safari puis Partager → « Sur l'écran d'accueil ».
@@ -44,7 +54,7 @@ Apnée Training/        coffre Obsidian = dépôt GitHub Paquito-app/Apnee-train
 
 ## Mode hors-ligne
 
-`sw.js` garde tous les fichiers de l'app dans le téléphone. **À chaque mise à jour de l'app, augmenter `APP_VERSION` dans `js/version.js`** (affiché dans l'en-tête : v4, v5…) et ajouter tout nouveau fichier à la liste `FILES` de `sw.js`. L'app vérifie les mises à jour à chaque retour et se recharge d'elle-même, sauf pendant une séance ou un chrono en cours.
+`sw.js` garde tous les fichiers de l'app dans le téléphone. **À chaque mise à jour de l'app, augmenter `APP_VERSION` dans `js/version.js`** (affiché dans l'en-tête : 1.0, 1.1…) et ajouter tout nouveau fichier à la liste `FILES` de `sw.js`. L'app vérifie les mises à jour à chaque retour et se recharge d'elle-même, sauf pendant une séance ou un chrono en cours.
 
 ## Sauvegarde
 

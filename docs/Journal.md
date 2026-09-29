@@ -25,3 +25,13 @@
 - v7 · Écrans avec la photo de piscine : cadres transparents (opacité 78 % → 40 %, flou 14 → 3 px) pour voir l'eau, textes gris éclaircis et soulignés d'une ombre douce pour rester lisibles.
 - v8 · Écrans photo : cadres à 10 %, sans flou, sans bordure, sans ligne ni ombre ; textes secondaires en blanc (82 %) au lieu du gris (choix « E + textes blancs » parmi 5 propositions).
 - v8 · Correction : des appuis rapides sur + / − sélectionnaient du texte (surbrillance, menu « Copier ») et pouvaient zoomer. Sélection de texte et zoom au double-tap désactivés hors champs de saisie.
+
+## 29/09/2026 — Version 1.0
+
+Première version partagée avec les apnéistes du club (numérotation remise à 1.0 ; les v2 à v8 ci-dessus étaient des versions de mise au point).
+
+Scan de nettoyage et de stabilité :
+- Supprimé : voix « 20 » jamais jouée (−26 Ko), variables et valeurs mémorisées jamais relues, branche de code vide, style de bouton inutilisé, identifiant inutile.
+- Correction : après une séance terminée, toucher un autre onglet laissait l'écran de fin affiché par-dessus la liste.
+- Stabilité : l'écran reste allumé quand on revient dans l'app pendant une séance ou un chrono ; une séance enregistrée avec un réglage manquant reprend la valeur par défaut.
+- Tests : séance complète dans chaque mode (respiration carrée, HIIT, tables O2 et CO2) jusqu'à l'écran de fin, chrono et record, sans erreur ; toutes les pages tiennent à l'écran de 375×600 à 430×932.

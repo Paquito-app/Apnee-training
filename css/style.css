@@ -302,7 +302,6 @@ main{
   color:var(--effort);
   border-color:transparent;
 }
-.ctrl-btn.ghost{color:var(--muted);}
 .ctrl-btn:active{opacity:.8;}
 
 /* ---- done screen ---- */

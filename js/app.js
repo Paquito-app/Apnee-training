@@ -114,7 +114,6 @@
     sequence: [],
     idx: -1,
     phaseStart: 0,
-    phaseDur: 0,
     remaining: 0,
     running: false,
     totalRounds: 0,
@@ -277,7 +276,6 @@
   var clockDigitFadeEl = document.getElementById("clockDigitFade");
   var clockSecGroupEl = document.getElementById("clockSecGroup");
   var secLabelUnsweptEl = document.getElementById("secLabelUnswept");
-  var secLabelSweptEl = document.getElementById("secLabelSwept");
   var secLabelAboveEl = document.getElementById("secLabelAbove");
   var secLabelBelowEl = document.getElementById("secLabelBelow");
   var clockSweptClipPathEl = document.getElementById("clockSweptClipPath");
@@ -476,7 +474,9 @@
         open.type = "button"; open.className = "preset-open"; open.textContent = pr.name;
         open.addEventListener("click", function(){
           state.cur = i;
-          state.configs[key] = JSON.parse(JSON.stringify(pr.cfg));
+          var cfg = JSON.parse(JSON.stringify(pr.cfg || {}));
+          proto.fields.forEach(function(f){ if(typeof cfg[f.key] !== "number") cfg[f.key] = f.default; });
+          state.configs[key] = cfg;
           saveJSON(KEY_CONFIGS, state.configs);
           state.view = "edit"; renderSetup();
         });
@@ -629,11 +629,9 @@
     }
     var ph = state.sequence[state.idx];
     var proto = PROTOCOLS[state.protocol];
-    state.phaseDur = ph.dur;
     state.phaseStart = performance.now();
     state.remaining = ph.dur;
     state.beepedAt = {};
-    state.beepedMinutes = {};
     if(proto.kind === "apnea" && ph.type === "hold"){
       playVoice("top");
     }
@@ -789,7 +787,7 @@
     if(proto.kind === "breath"){
       // no per-second tick in breath mode — only the phase-change beep (advancePhase) plays
     } else if(isApnea && ph.type !== "hold" && leadsIntoHold){
-      // voice countdown into an apnea hold: 30, 20, 10, then 5-1
+      // décompte vocal avant une apnée : 30, 10, puis 5-1
       var vAt = [30, 10, 5, 4, 3, 2, 1];
       for(var vi = 0; vi < vAt.length; vi++){
         var vv = vAt[vi], vk = "v" + vv;
@@ -799,9 +797,7 @@
           playVoice(String(vv));
         }
       }
-    } else if(isApnea && ph.type === "hold"){
-      // minute beep now handled centrally above, alongside the dial's minute markers
-    } else {
+    } else if(!(isApnea && ph.type === "hold")){   // pendant l'apnée : seulement le bip de chaque minute (plus haut)
       if(rem <= 3 && rem >= 1 && !state.beepedAt[rem]){
         state.beepedAt[rem] = true;
         tickBeep();
@@ -865,6 +861,7 @@
     }
     if(chronoOn) showChrono(false);
     if(runEl.classList.contains("active")) stopSession();   // exercice en cours : on réinitialise
+    if(doneEl.classList.contains("active")){ doneEl.classList.remove("active"); setupEl.classList.remove("hidden"); }
     state.protocol = btn.dataset.protocol;
     state.view = "list"; state.cur = -1;
     renderTabs();
@@ -881,9 +878,11 @@
   });
 
   // ---------- init ----------
-  // retour dans l'app (iPhone) : relance le son mis en veille
+  // retour dans l'app (iPhone) : relance le son mis en veille et garde l'écran allumé pendant la séance
   document.addEventListener("visibilitychange", function(){
-    if(!document.hidden && actx) window.ApneeAudio.resume(actx);
+    if(document.hidden) return;
+    if(actx) window.ApneeAudio.resume(actx);
+    if(state.running) requestWake();
   });
   try{
     var bgObs = new MutationObserver(applyBg);

@@ -37,7 +37,12 @@ Apnée fixe, repos qui raccourcit (minimum 0:05).
 | Récupération finale | 1:00 | 0:05 – 5:00 |
 | Rounds | 8 | 1 – 20 |
 
-Tables O2 et CO2 : voix « 30, 10, 5, 4, 3, 2, 1 » avant chaque apnée, « Top » au départ, « Respirez » à la fin, bip à chaque minute d'apnée.
+Tables O2 et CO2 : voix « 30, 10, 5, 4, 3, 2, 1 » avant chaque apnée, « Top » au départ, « Respirez » à la fin, bip à chaque minute d'apnée, bips sur les 3 dernières secondes des autres étapes.
+
+## Sons
+- Un seul bip dans toute l'app : court et aigu (880 Hz).
+- Fin de séance : son de bulles qui remontent.
+- Voix à 50 % de leur volume d'origine, équilibrées avec les bips.
 
 ## HIIT Cardio
 | Réglage | Défaut | Plage |

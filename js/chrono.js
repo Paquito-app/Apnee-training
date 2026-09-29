@@ -301,7 +301,9 @@
   });
 
   document.addEventListener("visibilitychange",function(){
-    if(!document.hidden && actx) window.ApneeAudio.resume(actx);
+    if(document.hidden) return;
+    if(actx) window.ApneeAudio.resume(actx);
+    if(running) requestWake();   // l'iPhone relâche le maintien de l'écran quand on quitte l'app
   });
 
   renderBest();
