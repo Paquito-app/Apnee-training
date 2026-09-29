@@ -176,18 +176,9 @@
     window.ApneeAudio.resume(actx);
     return actx;
   }
-  // Même son « Très grave » que dans le reste de l'appli : sinus 440 Hz, extinction exponentielle.
+  // Même bip que dans le reste de l'appli (voir js/audio.js).
   function beep(){
-    var c=getCtx();
-    if(c){
-      var t0=c.currentTime, osc=c.createOscillator(), g=c.createGain();
-      osc.type="sine"; osc.frequency.value=440;
-      g.gain.setValueAtTime(0,t0);
-      g.gain.linearRampToValueAtTime(0.24,t0+0.025);
-      g.gain.exponentialRampToValueAtTime(0.0001,t0+0.28);
-      osc.connect(g); g.connect(c.destination);
-      osc.start(t0); osc.stop(t0+0.3);
-    }
+    window.ApneeAudio.bip(getCtx());
     try{ if(navigator.vibrate) navigator.vibrate(150); }catch(e){}
   }
 

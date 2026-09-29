@@ -147,40 +147,12 @@
     window.ApneeAudio.resume(actx);
     return actx;
   }
-  function beep(freq, dur, delay, gainVal){
-    var ctx = getCtx();
-    if(!ctx) return;
-    var t0 = ctx.currentTime + (delay||0);
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0, t0);
-    gain.gain.linearRampToValueAtTime(gainVal||0.2, t0+0.02);
-    gain.gain.linearRampToValueAtTime(0, t0+dur);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(t0);
-    osc.stop(t0+dur+0.02);
-  }
+  // Un seul son de bip dans toute l'app (voir js/audio.js).
+  function beep(delay){ window.ApneeAudio.bip(getCtx(), delay); }
   function buzz(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
-  function tickBeep(){ beep(880, 0.09, 0, 0.15); buzz(40); }
-  function transitionBeep(){ beep(560, 0.28, 0, 0.22); buzz(100); }
-  function beepExp(freq, dur, attack, gainVal){
-    var ctx = getCtx();
-    if(!ctx) return;
-    var t0 = ctx.currentTime;
-    var osc = ctx.createOscillator();
-    var gain = ctx.createGain();
-    osc.type = "sine";
-    osc.frequency.value = freq;
-    gain.gain.setValueAtTime(0, t0);
-    gain.gain.linearRampToValueAtTime(gainVal, t0+attack);
-    gain.gain.exponentialRampToValueAtTime(0.0001, t0+dur);
-    osc.connect(gain).connect(ctx.destination);
-    osc.start(t0);
-    osc.stop(t0+dur+0.02);
-  }
-  function minuteBeep(){ beepExp(440, 0.28, 0.025, 0.24); buzz(150); }
+  function tickBeep(){ beep(); buzz(40); }
+  function transitionBeep(){ beep(); buzz(100); }
+  function minuteBeep(){ beep(); buzz(150); }
 
   var voices = [];
   function loadVoices(){ try{ voices = speechSynthesis.getVoices(); }catch(e){} }
@@ -537,13 +509,13 @@
       nameInp = document.createElement("input");
       nameInp.type = "text"; nameInp.maxLength = 24; nameInp.placeholder = "Nom de la séance";
       nameInp.className = "name-inp"; nameInp.setAttribute("aria-label","Nom de la séance");
+      top.appendChild(nameInp); // sur la même ligne que « ‹ Séances » : gain de hauteur
     } else {
       var ttl = document.createElement("div");
       ttl.className = "setup-name"; ttl.textContent = list[state.cur] ? list[state.cur].name : "";
       top.appendChild(ttl);
     }
     setupEl.appendChild(top);
-    if(nameInp) setupEl.appendChild(nameInp);
 
     var group = document.createElement("div");
     group.className = "field-group";
@@ -855,9 +827,7 @@
     var isCO2 = state.protocol === "co2";
     document.getElementById("doneCO2").style.display = isCO2 ? "block" : "none";
     document.getElementById("doneDiver").style.display = (isCarre || isO2 || isCO2) ? "none" : "block";
-    beep(660, 0.15, 0, 0.2);
-    beep(880, 0.2, 0.18, 0.22);
-    beep(1100, 0.3, 0.38, 0.24);
+    beep(0); beep(0.18); beep(0.36);
     buzz([120, 80, 120, 80, 250]);
   }
 

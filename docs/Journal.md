@@ -14,3 +14,6 @@
 - Son sur iPhone : session audio en mode « lecture » (sons même avec le bouton silencieux) et relance du son au retour dans l'app (`js/audio.js`).
 - Chrono libre : le cadran s'adapte à la hauteur de l'écran, tout tient sans défiler.
 - Service worker `apnee-v2`.
+- Un seul son de bip partout (880 Hz court, celui des 3 dernières secondes) : changements d'étape, minutes d'apnée, fin de séance (3 bips), bips du chrono libre.
+- Toutes les pages tiennent à l'écran sans défiler (espacements proportionnels à la hauteur, nom de la séance sur la ligne du haut). Vérifié de 375×600 à 430×932.
+- Service worker `apnee-v3`.

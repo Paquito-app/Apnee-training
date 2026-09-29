@@ -39,5 +39,23 @@
     try{ if(ctx && ctx.state !== "running") ctx.resume(); }catch(e){}
   }
 
-  window.ApneeAudio = { unlock: unlock, resume: resume };
+  // Le bip unique de l'app : sinus 880 Hz, 90 ms (celui des 3 dernières secondes).
+  function bip(ctx, delay){
+    if(!ctx) return;
+    try{
+      var t0 = ctx.currentTime + (delay||0);
+      var osc = ctx.createOscillator();
+      var gain = ctx.createGain();
+      osc.type = "sine";
+      osc.frequency.value = 880;
+      gain.gain.setValueAtTime(0, t0);
+      gain.gain.linearRampToValueAtTime(0.15, t0+0.02);
+      gain.gain.linearRampToValueAtTime(0, t0+0.09);
+      osc.connect(gain).connect(ctx.destination);
+      osc.start(t0);
+      osc.stop(t0+0.11);
+    }catch(e){}
+  }
+
+  window.ApneeAudio = { unlock: unlock, resume: resume, bip: bip };
 })();
