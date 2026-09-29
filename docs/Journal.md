@@ -22,3 +22,4 @@
 - v5 · Son de fin d'exercice : bulle qui remonte (grosse bulle grave étouffée + deux petites bulles), choisi parmi 3 propositions.
 - v5 · Chrono libre plus grand : espaces resserrés entre cadran, bouton et temps, plus de taille maximale (cadran 285 → 343 px sur iPhone standard, 398 px sur grand iPhone).
 - v6 · Volume des voix baissé de moitié (−6 dB, réglage `VOICE_VOLUME` dans `js/app.js`) pour être équilibré avec les bips et la bulle de fin. Mesure avant : voix ~2,5× plus fortes que le bip.
+- v7 · Écrans avec la photo de piscine : cadres transparents (opacité 78 % → 40 %, flou 14 → 3 px) pour voir l'eau, textes gris éclaircis et soulignés d'une ombre douce pour rester lisibles.

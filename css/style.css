@@ -45,6 +45,20 @@ body{
   -webkit-backdrop-filter:blur(14px);
 }
 html{height:100%;}
+/* écrans avec la photo de piscine : cadres transparents pour voir l'eau,
+   textes éclaircis et soulignés d'une ombre douce pour rester lisibles */
+body[data-bg="pool"]{
+  --surface:rgba(10,16,28,.42);
+  --surface-2:rgba(10,16,28,.38);
+  --border:rgba(255,255,255,.14);
+  --muted:#C3CBD8;
+}
+body[data-bg="pool"] .field-group, body[data-bg="pool"] .tabs, body[data-bg="pool"] .preview{
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+}
+body[data-bg="pool"] header, body[data-bg="pool"] #setup{text-shadow:0 1px 3px rgba(0,0,0,.75), 0 0 10px rgba(0,0,0,.35);}
+body[data-bg="pool"] .stepper button, body[data-bg="pool"] .tab.active{background:rgba(10,16,28,.62);}
 /* fonds : photo de piscine (respiration, tables O2/CO2) ; bleu nuit éclairci (HIIT, chrono) */
 body[data-bg="pool"]{--bg-image:url(../img/piscine.jpg);}
 body[data-bg="navy"]{--bg-image:linear-gradient(180deg,#16213f 0%,#0f172d 100%);}
