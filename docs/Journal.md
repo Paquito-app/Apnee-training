@@ -23,3 +23,5 @@
 - v5 · Chrono libre plus grand : espaces resserrés entre cadran, bouton et temps, plus de taille maximale (cadran 285 → 343 px sur iPhone standard, 398 px sur grand iPhone).
 - v6 · Volume des voix baissé de moitié (−6 dB, réglage `VOICE_VOLUME` dans `js/app.js`) pour être équilibré avec les bips et la bulle de fin. Mesure avant : voix ~2,5× plus fortes que le bip.
 - v7 · Écrans avec la photo de piscine : cadres transparents (opacité 78 % → 40 %, flou 14 → 3 px) pour voir l'eau, textes gris éclaircis et soulignés d'une ombre douce pour rester lisibles.
+- v8 · Écrans photo : cadres à 10 %, sans flou, sans bordure, sans ligne ni ombre ; textes secondaires en blanc (82 %) au lieu du gris (choix « E + textes blancs » parmi 5 propositions).
+- v8 · Correction : des appuis rapides sur + / − sélectionnaient du texte (surbrillance, menu « Copier ») et pouvaient zoomer. Sélection de texte et zoom au double-tap désactivés hors champs de saisie.
