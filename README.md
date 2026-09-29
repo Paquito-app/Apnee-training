@@ -54,7 +54,7 @@ Apnée Training/        coffre Obsidian = dépôt GitHub Paquito-app/Apnee-train
 
 ## Mode hors-ligne
 
-`sw.js` garde tous les fichiers de l'app dans le téléphone. **À chaque mise à jour de l'app, augmenter `APP_VERSION` dans `js/version.js`** (affiché dans l'en-tête : 1.0, 1.1…) et ajouter tout nouveau fichier à la liste `FILES` de `sw.js`. L'app vérifie les mises à jour à chaque retour et se recharge d'elle-même, sauf pendant une séance ou un chrono en cours.
+`sw.js` garde tous les fichiers de l'app dans le téléphone. **À chaque mise à jour de l'app, augmenter `APP_VERSION` dans `js/version.js`** (affiché dans l'en-tête : 1.0, 1.1…), ou `APP_BUILD` pour une petite retouche qui garde le même numéro affiché, et ajouter tout nouveau fichier à la liste `FILES` de `sw.js`. L'app vérifie les mises à jour à chaque retour et se recharge d'elle-même, sauf pendant une séance ou un chrono en cours.
 
 ## Sauvegarde
 

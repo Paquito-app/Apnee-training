@@ -1,7 +1,7 @@
 // Service worker : garde toute l'app en mémoire pour qu'elle marche sans réseau.
-// Le numéro de version vient de js/version.js : l'augmenter à chaque mise à jour de l'app.
+// Le numéro de version vient de js/version.js : augmenter APP_VERSION (ou APP_BUILD pour une retouche) à chaque mise à jour.
 importScripts("js/version.js");
-var VERSION = "apnee-v" + APP_VERSION;
+var VERSION = "apnee-v" + APP_VERSION + "-" + APP_BUILD;
 var FILES = [
   "./",
   "index.html",

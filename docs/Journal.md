@@ -35,3 +35,4 @@ Scan de nettoyage et de stabilité :
 - Correction : après une séance terminée, toucher un autre onglet laissait l'écran de fin affiché par-dessus la liste.
 - Stabilité : l'écran reste allumé quand on revient dans l'app pendant une séance ou un chrono ; une séance enregistrée avec un réglage manquant reprend la valeur par défaut.
 - Tests : séance complète dans chaque mode (respiration carrée, HIIT, tables O2 et CO2) jusqu'à l'écran de fin, chrono et record, sans erreur ; toutes les pages tiennent à l'écran de 375×600 à 430×932.
+- 1.0 (fabrication 2) · Croix jaune de suppression d'une séance en gras, zone de toucher 48 × 48 px ; cadre du nom de séance à 30 % avec texte d'aide en blanc.
