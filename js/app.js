@@ -21,18 +21,25 @@
       kind: "apnea",
       fields: [
         {key:"breathSec", label:"Préparation", hint:"Avant le premier round", step:5, min:15, max:300, default:60},
-        {key:"holdSec", label:"Temps d'apnée", hint:"Durée fixe à chaque round", step:5, min:15, max:600, default:90},
-        {key:"restStart", label:"Temps de repos initial", hint:"Premier repos, diminue à chaque round", step:5, min:15, max:600, default:120},
-        {key:"restStep", label:"Diminution du temps de repos", hint:"Par round, jusqu'à 0:05 minimum", step:5, min:5, max:60, default:15},
+        {key:"holdSec", label:"Temps d'apnée", hint:"Durée fixe à chaque round", step:5, min:15, max:600, default:60},
+        {key:"restStart", label:"Temps de repos initial", hint:"Premier repos, diminue à chaque round", step:5, min:15, max:600, default:45},
+        {key:"restStep", label:"Diminution du temps de repos", hint:"Retirée à chaque round", step:5, min:5, max:60, default:10},
         {key:"recSec", label:"Temps de récupération", hint:"Après la dernière apnée", step:5, min:5, max:300, default:60},
-        {key:"rounds", label:"Rounds", hint:"Nombre de répétitions", step:1, min:1, max:20, default:8, isRounds:true}
+        {key:"rounds", label:"Rounds", hint:"Nombre de répétitions", step:1, min:1, max:20, default:5, isRounds:true}
       ],
+      // réglages impossibles : le dernier repos (entre les deux dernières apnées) tomberait à 0 ou moins
+      check: function(cfg){
+        if(cfg.rounds < 2) return null;
+        var n = cfg.rounds - 1;
+        var last = cfg.restStart - (n-1)*cfg.restStep;
+        if(last > 0) return null;
+        return "Le "+n+"ᵉ repos tomberait à "+(last < 0 ? "−" : "")+fmt(-last)+" : réduisez la diminution ou les rounds.";
+      },
       build: function(cfg){
         var seq = [{type:"breathPrep", dur:cfg.breathSec, round:0}];
         for(var i=0;i<cfg.rounds;i++){
           seq.push({type:"hold", dur:cfg.holdSec, round:i+1});
           var rest = cfg.restStart - i*cfg.restStep;
-          if(rest < 5) rest = 5;
           if(i < cfg.rounds-1) seq.push({type:"rest", dur:rest, round:i+1});
         }
         seq.push({type:"recovery", dur:cfg.recSec, round:cfg.rounds});
@@ -47,10 +54,16 @@
         {key:"breathSec", label:"Préparation", hint:"Avant le premier round", step:5, min:15, max:300, default:60},
         {key:"holdStart", label:"Durée apnée initiale", hint:"Première apnée", step:5, min:15, max:600, default:60},
         {key:"holdStep", label:"Augmentation temps d'apnée", hint:"Ajout à chaque round", step:5, min:5, max:60, default:15},
-        {key:"restSec", label:"Temps de repos", hint:"Entre chaque apnée", step:5, min:15, max:600, default:120},
+        {key:"restSec", label:"Temps de repos", hint:"Entre chaque apnée", step:5, min:15, max:600, default:60},
         {key:"recSec", label:"Temps de récupération", hint:"Après la dernière apnée", step:5, min:5, max:300, default:60},
-        {key:"rounds", label:"Rounds", hint:"Nombre de répétitions", step:1, min:1, max:20, default:8, isRounds:true}
+        {key:"rounds", label:"Rounds", hint:"Nombre de répétitions", step:1, min:1, max:20, default:5, isRounds:true}
       ],
+      // réglages impossibles : la dernière apnée dépasserait O2_MAX_HOLD
+      check: function(cfg){
+        var last = cfg.holdStart + (cfg.rounds-1)*cfg.holdStep;
+        if(last <= O2_MAX_HOLD) return null;
+        return "Dernière apnée à "+fmt(last)+", au-delà du maximum de "+fmt(O2_MAX_HOLD)+" : réduisez les réglages.";
+      },
       build: function(cfg){
         var seq = [{type:"breathPrep", dur:cfg.breathSec, round:0}];
         for(var i=0;i<cfg.rounds;i++){
@@ -66,11 +79,11 @@
       name: "Respiration carrée",
       kind: "breath",
       fields: [
-        {key:"inspi", label:"Inspiration", hint:"Durée de l'inspiration", step:1, min:1, max:60, default:4},
-        {key:"hold1", label:"Rétention (poumons pleins)", hint:"0 = étape désactivée", step:1, min:0, max:60, default:4},
-        {key:"expi", label:"Expiration", hint:"Durée de l'expiration", step:1, min:1, max:60, default:4},
-        {key:"hold2", label:"Rétention (poumons vides)", hint:"0 = étape désactivée", step:1, min:0, max:60, default:4},
-        {key:"rounds", label:"Cycles", hint:"Nombre de répétitions", step:1, min:1, max:50, default:6, isRounds:true}
+        {key:"inspi", label:"Inspiration", hint:"Durée de l'inspiration", step:1, min:1, max:60, default:5},
+        {key:"hold1", label:"Rétention (poumons pleins)", hint:"0 = étape désactivée", step:1, min:0, max:60, default:5},
+        {key:"expi", label:"Expiration", hint:"Durée de l'expiration", step:1, min:1, max:60, default:5},
+        {key:"hold2", label:"Rétention (poumons vides)", hint:"0 = étape désactivée", step:1, min:0, max:60, default:5},
+        {key:"rounds", label:"Cycles", hint:"Nombre de répétitions", step:1, min:1, max:50, default:5, isRounds:true}
       ],
       build: function(cfg){
         var seq = [];
@@ -104,6 +117,12 @@
   };
 
   var PREPARE_SEC = 5;
+  var O2_MAX_HOLD = 600; // durée maximale d'une apnée en table O2 (10:00)
+
+  function problemFor(protoKey, cfg){
+    var check = PROTOCOLS[protoKey].check;
+    return check ? check(cfg) : null;
+  }
 
   var state = {
     protocol: "carre", // l'app s'ouvre toujours sur la respiration carrée
@@ -590,16 +609,22 @@
       el.textContent = f.isRounds ? cfg[f.key] : fmt(cfg[f.key]);
     });
     var total = totalDuration(state.protocol, cfg);
+    var problem = problemFor(state.protocol, cfg);
     var line = document.getElementById("previewLine");
     if(line){
-      line.innerHTML = 'Durée totale estimée <b>'+fmt(total)+'</b>';
+      line.classList.toggle("error", !!problem);
+      if(problem) line.textContent = problem;
+      else line.innerHTML = 'Durée totale estimée <b>'+fmt(total)+'</b>';
     }
+    var startBtn = document.getElementById("startBtn");
+    if(startBtn && state.view === "edit") startBtn.classList.toggle("blocked", !!problem);
   }
 
   // ---------- session control ----------
   function startSession(){
     var proto = PROTOCOLS[state.protocol];
     var cfg = state.configs[state.protocol];
+    if(problemFor(state.protocol, cfg)) return; // démarrage bloqué, le message est affiché au-dessus du bouton
     var built = proto.build(cfg);
     state.sequence = (proto.kind === "apnea") ? built : [{type:"prepare", dur:PREPARE_SEC, round:0}].concat(built);
     state.totalRounds = cfg.rounds;

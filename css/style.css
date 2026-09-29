@@ -191,6 +191,9 @@ main{
   color:var(--muted);
 }
 .preview b{color:var(--text);font-size:14px;}
+/* réglages impossibles : message à la place de la durée, bouton Démarrer grisé */
+.preview.error{color:var(--ready);font-weight:600;line-height:1.35;}
+.start-btn.blocked{opacity:.4;}
 .presets{display:flex;flex-direction:column;gap:10px;}
 .presets button{appearance:none;font-family:inherit;cursor:pointer;}
 .preset-row{display:flex;align-items:center;gap:8px;}

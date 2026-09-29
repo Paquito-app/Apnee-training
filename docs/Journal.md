@@ -36,3 +36,12 @@ Scan de nettoyage et de stabilité :
 - Stabilité : l'écran reste allumé quand on revient dans l'app pendant une séance ou un chrono ; une séance enregistrée avec un réglage manquant reprend la valeur par défaut.
 - Tests : séance complète dans chaque mode (respiration carrée, HIIT, tables O2 et CO2) jusqu'à l'écran de fin, chrono et record, sans erreur ; toutes les pages tiennent à l'écran de 375×600 à 430×932.
 - 1.0 (fabrication 2) · Croix jaune de suppression d'une séance en gras, zone de toucher 48 × 48 px ; cadre du nom de séance à 30 % avec texte d'aide en blanc.
+
+## 29/09/2026 — 1.0 (fabrication 3)
+
+- Nouvelles valeurs par défaut (pour les nouvelles séances ; les séances déjà enregistrées ne changent pas) :
+  - Respiration carrée : inspiration, rétentions et expiration à 0:05, 5 cycles.
+  - Table CO2 : préparation 1:00, apnée 1:00, repos initial 0:45, diminution 0:10 (repos 0:45 → 0:35 → 0:25 → 0:15), 5 rounds.
+  - Table O2 : préparation 1:00, apnée initiale 1:00, augmentation +0:15, repos 1:00, 5 rounds.
+- Contrôle des réglages impossibles : si un repos CO2 tombe à 0:00 ou moins, ou si la dernière apnée O2 dépasse 10:00, un message jaune remplace la durée totale et « Démarrer » est grisé et bloqué. (Avant, le repos CO2 était discrètement ramené à 0:05.)
+- Vérifié à 375×600 : le message tient sur 2 lignes et le bouton reste à l'écran.
