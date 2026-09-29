@@ -21,3 +21,4 @@
 - Numéro de version affiché dans l'en-tête (`js/version.js`, v4), vérification des mises à jour à chaque retour dans l'app, rechargement automatique hors séance.
 - v5 · Son de fin d'exercice : bulle qui remonte (grosse bulle grave étouffée + deux petites bulles), choisi parmi 3 propositions.
 - v5 · Chrono libre plus grand : espaces resserrés entre cadran, bouton et temps, plus de taille maximale (cadran 285 → 343 px sur iPhone standard, 398 px sur grand iPhone).
+- v6 · Volume des voix baissé de moitié (−6 dB, réglage `VOICE_VOLUME` dans `js/app.js`) pour être équilibré avec les bips et la bulle de fin. Mesure avant : voix ~2,5× plus fortes que le bip.

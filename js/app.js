@@ -166,7 +166,7 @@
       var u = new SpeechSynthesisUtterance(text);
       u.lang = "fr-FR";
       u.rate = 1;
-      u.volume = 1;
+      u.volume = VOICE_VOLUME;
       var frVoice = voices.find(function(v){ return v.lang && v.lang.toLowerCase().indexOf("fr") === 0; });
       if(frVoice) u.voice = frVoice;
       speechSynthesis.cancel();
@@ -176,6 +176,9 @@
 
   // ---------- voix enregistrées ----------
   var VOICE_LEAD = 0.04; // s : chaque mot démarre 40 ms après le début de son fichier
+  // Volume des voix (1 = volume d'origine). 0.5 = −6 dB : équilibré avec les bips et la bulle de fin.
+  var VOICE_VOLUME = 0.5;
+  var voiceGain = null;
   var VOICE_FALLBACK = {top:"Top", respirez:"Respirez"};
   var voiceBuf = {}, voiceLoading = false, voiceSrc = [];
   function b64ToBuf(b64){
@@ -201,7 +204,8 @@
     try{
       var src = ctx.createBufferSource();
       src.buffer = b;
-      src.connect(ctx.destination);
+      if(!voiceGain){ voiceGain = ctx.createGain(); voiceGain.gain.value = VOICE_VOLUME; voiceGain.connect(ctx.destination); }
+      src.connect(voiceGain);
       src.onended = function(){ voiceSrc = voiceSrc.filter(function(x){ return x !== src; }); };
       voiceSrc.push(src);
       src.start();
