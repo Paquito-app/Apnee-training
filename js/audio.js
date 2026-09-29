@@ -57,5 +57,36 @@
     }catch(e){}
   }
 
-  window.ApneeAudio = { unlock: unlock, resume: resume, bip: bip };
+  // Une bulle : sinus dont la fréquence monte vite (la bulle rétrécit en remontant).
+  function bubble(ctx, t0, f0, f1, dur, vol, lowpass){
+    var osc = ctx.createOscillator(), gain = ctx.createGain(), out = gain;
+    osc.type = "sine";
+    osc.frequency.setValueAtTime(f0, t0);
+    osc.frequency.exponentialRampToValueAtTime(f1, t0 + dur);
+    gain.gain.setValueAtTime(0, t0);
+    gain.gain.linearRampToValueAtTime(vol, t0 + 0.008);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t0 + dur);
+    osc.connect(gain);
+    if(lowpass){
+      var f = ctx.createBiquadFilter();
+      f.type = "lowpass"; f.frequency.value = lowpass; f.Q.value = 0.7;
+      gain.connect(f); out = f;
+    }
+    out.connect(ctx.destination);
+    osc.start(t0);
+    osc.stop(t0 + dur + 0.02);
+  }
+
+  // Son de fin d'exercice : grosse bulle grave, étouffée comme sous l'eau, puis deux petites bulles.
+  function finBulles(ctx){
+    if(!ctx) return;
+    try{
+      var t = ctx.currentTime + 0.03;
+      bubble(ctx, t, 150, 520, 0.45, 0.42, 1400);
+      bubble(ctx, t + 0.38, 480, 1200, 0.13, 0.18);
+      bubble(ctx, t + 0.52, 640, 1500, 0.11, 0.14);
+    }catch(e){}
+  }
+
+  window.ApneeAudio = { unlock: unlock, resume: resume, bip: bip, finBulles: finBulles };
 })();

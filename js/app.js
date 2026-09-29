@@ -827,7 +827,7 @@
     var isCO2 = state.protocol === "co2";
     document.getElementById("doneCO2").style.display = isCO2 ? "block" : "none";
     document.getElementById("doneDiver").style.display = (isCarre || isO2 || isCO2) ? "none" : "block";
-    beep(0); beep(0.18); beep(0.36);
+    window.ApneeAudio.finBulles(getCtx());
     buzz([120, 80, 120, 80, 250]);
   }
 

@@ -312,16 +312,16 @@ main{
   flex:1;
   flex-direction:column;
   align-items:center;
-  gap:clamp(12px,3.2vh,28px);
+  gap:4px;
   min-height:0;
   overflow-y:auto;
-  padding-block:4px 12px;
+  padding-block:2px 6px;
   --chr-tick:#5C6470;
 }
 #chrono.active{display:flex;}
 /* le cadran occupe la place restante : tout l'écran chrono tient sans défiler */
-.chr-dial{flex:1 1 0;min-height:170px;width:100%;container-type:size;display:flex;align-items:center;justify-content:center;}
-.chr-dial svg{width:min(100cqw,100cqh,360px);height:min(100cqw,100cqh,360px);display:block;}
+.chr-dial{flex:1 1 0;min-height:100px;width:100%;container-type:size;display:flex;align-items:center;justify-content:center;}
+.chr-dial svg{width:min(100cqw,100cqh);height:min(100cqw,100cqh);display:block;}
 .chr-t-fine{stroke:var(--chr-tick);stroke-width:1.1;}
 .chr-t-sec{stroke:var(--chr-tick);stroke-width:1.8;}
 .chr-t-major{stroke:var(--text);stroke-width:3.4;}
@@ -331,7 +331,7 @@ main{
 .chr-min-num{fill:var(--ready);font-family:'Baloo 2','Onest',sans-serif;font-size:26px;font-weight:800;text-anchor:middle;}
 .chr-hand{stroke:var(--rest);stroke-linecap:round;}
 .chr-btn{
-  appearance:none;background:none;border:0;padding:12px 28px;
+  appearance:none;background:none;border:0;padding:4px 28px;
   font-family:'Onest',sans-serif;font-size:26px;font-weight:800;letter-spacing:.08em;line-height:1;
   cursor:pointer;color:var(--text);
 }
@@ -339,7 +339,7 @@ main{
 .chr-btn:active{opacity:.6;}
 .chr-btn:focus-visible{outline:2px solid var(--text);outline-offset:4px;}
 .chr-result{
-  min-height:48px;font-family:'Baloo 2','Onest',sans-serif;font-size:44px;font-weight:800;line-height:1;
+  min-height:40px;font-family:'Baloo 2','Onest',sans-serif;font-size:44px;font-weight:800;line-height:1;
   font-variant-numeric:tabular-nums;color:var(--text);
 }
 .chr-best{font-size:14px;font-weight:500;color:var(--muted);text-align:center;}
@@ -366,7 +366,7 @@ main{
 .chr-edit input:focus-visible,.chr-edit button:focus-visible,.chr-link:focus-visible{outline:2px solid var(--text);outline-offset:2px;}
 
 .chr-rec{font-weight:600;color:var(--text);}
-.chr-bip{margin-top:calc(-.5 * clamp(12px,3.2vh,28px));display:flex;flex-direction:column;align-items:center;gap:8px;}
+.chr-bip{margin-top:4px;display:flex;flex-direction:column;align-items:center;gap:8px;}
 .chr-bip-row{display:flex;align-items:center;justify-content:center;gap:8px;}
 .chr-bip-label{color:var(--muted);font-size:14px;}
 .chr-bip input{

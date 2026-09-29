@@ -19,3 +19,5 @@
 - Service worker `apnee-v3`.
 - Correction mise à jour : le service worker téléchargeait parfois d'anciens fichiers gardés en cache par le navigateur (le nouveau bip n'arrivait pas sur l'iPhone). Téléchargement forcé des fichiers frais.
 - Numéro de version affiché dans l'en-tête (`js/version.js`, v4), vérification des mises à jour à chaque retour dans l'app, rechargement automatique hors séance.
+- v5 · Son de fin d'exercice : bulle qui remonte (grosse bulle grave étouffée + deux petites bulles), choisi parmi 3 propositions.
+- v5 · Chrono libre plus grand : espaces resserrés entre cadran, bouton et temps, plus de taille maximale (cadran 285 → 343 px sur iPhone standard, 398 px sur grand iPhone).
