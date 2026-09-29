@@ -8,3 +8,4 @@
 - Écran de fin : « cycles » pour la respiration carrée, singulier/pluriel.
 - L'app s'ouvre toujours sur la respiration carrée.
 - Projet rangé dans le coffre Obsidian et relié au dépôt GitHub.
+- Mise en ligne sur GitHub Pages : https://paquito-app.github.io/Apnee-training/

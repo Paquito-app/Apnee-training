@@ -14,7 +14,9 @@ Détail des réglages : [[docs/Protocoles|Protocoles]] · Historique : [[docs/Jo
 
 ## Utilisation
 
-Ouvrir `index.html` dans un navigateur. Aucune installation, aucun serveur nécessaire.
+**En ligne : https://paquito-app.github.io/Apnee-training/**. Sur iPhone, l'ouvrir dans Safari puis Partager → « Sur l'écran d'accueil ».
+
+En local : ouvrir `index.html` dans un navigateur. Aucune installation, aucun serveur nécessaire.
 
 Les séances enregistrées et le record sont gardés dans le navigateur de chaque appareil (`localStorage`, clés `apnee.v1.*`).
 
