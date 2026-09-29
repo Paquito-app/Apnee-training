@@ -37,13 +37,14 @@ Apnée Training/        coffre Obsidian = dépôt GitHub Paquito-app/Apnee-train
 ├── js/chrono.js       chrono libre
 ├── js/voices.js       voix enregistrées (audio intégré)
 ├── js/audio.js        déblocage du son sur iPhone
+├── js/version.js      numéro de version de l'app
 ├── img/               photo de piscine et silhouettes de plongeurs
 └── docs/              notes du projet (protocoles, journal)
 ```
 
 ## Mode hors-ligne
 
-`sw.js` garde tous les fichiers de l'app dans le téléphone. **À chaque mise à jour de l'app, augmenter `VERSION` dans `sw.js`** (`apnee-v1` → `apnee-v2`…) et ajouter tout nouveau fichier à la liste `FILES` : sinon les téléphones gardent l'ancienne version. La nouvelle version s'affiche au lancement suivant.
+`sw.js` garde tous les fichiers de l'app dans le téléphone. **À chaque mise à jour de l'app, augmenter `APP_VERSION` dans `js/version.js`** (affiché dans l'en-tête : v4, v5…) et ajouter tout nouveau fichier à la liste `FILES` de `sw.js`. L'app vérifie les mises à jour à chaque retour et se recharge d'elle-même, sauf pendant une séance ou un chrono en cours.
 
 ## Sauvegarde
 

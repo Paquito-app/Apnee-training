@@ -1,12 +1,14 @@
 // Service worker : garde toute l'app en mémoire pour qu'elle marche sans réseau.
-// À chaque mise à jour de l'app, augmenter VERSION pour que les téléphones récupèrent les nouveaux fichiers.
-var VERSION = "apnee-v3";
+// Le numéro de version vient de js/version.js : l'augmenter à chaque mise à jour de l'app.
+importScripts("js/version.js");
+var VERSION = "apnee-v" + APP_VERSION;
 var FILES = [
   "./",
   "index.html",
   "manifest.webmanifest",
   "css/fonts.css",
   "css/style.css",
+  "js/version.js",
   "js/audio.js",
   "js/app.js",
   "js/chrono.js",
@@ -27,7 +29,9 @@ var FILES = [
 ];
 
 self.addEventListener("install", function(e){
-  e.waitUntil(caches.open(VERSION).then(function(c){ return c.addAll(FILES); }).then(function(){ return self.skipWaiting(); }));
+  // cache:"reload" : toujours télécharger les fichiers frais, jamais une copie gardée par le navigateur
+  var reqs = FILES.map(function(f){ return new Request(f, {cache:"reload"}); });
+  e.waitUntil(caches.open(VERSION).then(function(c){ return c.addAll(reqs); }).then(function(){ return self.skipWaiting(); }));
 });
 
 self.addEventListener("activate", function(e){

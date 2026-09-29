@@ -17,3 +17,5 @@
 - Un seul son de bip partout (880 Hz court, celui des 3 dernières secondes) : changements d'étape, minutes d'apnée, fin de séance (3 bips), bips du chrono libre.
 - Toutes les pages tiennent à l'écran sans défiler (espacements proportionnels à la hauteur, nom de la séance sur la ligne du haut). Vérifié de 375×600 à 430×932.
 - Service worker `apnee-v3`.
+- Correction mise à jour : le service worker téléchargeait parfois d'anciens fichiers gardés en cache par le navigateur (le nouveau bip n'arrivait pas sur l'iPhone). Téléchargement forcé des fichiers frais.
+- Numéro de version affiché dans l'en-tête (`js/version.js`, v4), vérification des mises à jour à chaque retour dans l'app, rechargement automatique hors séance.
