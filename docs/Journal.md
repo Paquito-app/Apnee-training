@@ -9,3 +9,5 @@
 - L'app s'ouvre toujours sur la respiration carrée.
 - Projet rangé dans le coffre Obsidian et relié au dépôt GitHub.
 - Mise en ligne sur GitHub Pages : https://paquito-app.github.io/Apnee-training/
+- Icône de l'app (logo plongeuse) pour l'écran d'accueil et l'onglet.
+- Mode hors-ligne complet : polices intégrées, service worker `apnee-v1`, manifeste d'installation.
