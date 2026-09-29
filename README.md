@@ -36,6 +36,7 @@ Apnée Training/        coffre Obsidian = dépôt GitHub Paquito-app/Apnee-train
 ├── js/app.js          séances (respiration, tables O2/CO2, HIIT)
 ├── js/chrono.js       chrono libre
 ├── js/voices.js       voix enregistrées (audio intégré)
+├── js/audio.js        déblocage du son sur iPhone
 ├── img/               photo de piscine et silhouettes de plongeurs
 └── docs/              notes du projet (protocoles, journal)
 ```

@@ -144,6 +144,7 @@
     if(!actx){
       try{ actx = new (window.AudioContext || window.webkitAudioContext)(); }catch(e){}
     }
+    window.ApneeAudio.resume(actx);
     return actx;
   }
   function beep(freq, dur, delay, gainVal){
@@ -634,7 +635,7 @@
     runEl.classList.add("active");
     doneEl.classList.remove("active");
     requestWake();
-    getCtx(); // unlock audio on user gesture
+    window.ApneeAudio.unlock(getCtx()); // débloque le son (iPhone) pendant l'appui sur Démarrer
     loadVoiceBuffers();
     advancePhase();
     state.running = true;
@@ -906,6 +907,10 @@
   });
 
   // ---------- init ----------
+  // retour dans l'app (iPhone) : relance le son mis en veille
+  document.addEventListener("visibilitychange", function(){
+    if(!document.hidden && actx) window.ApneeAudio.resume(actx);
+  });
   try{
     var bgObs = new MutationObserver(applyBg);
     bgObs.observe(runEl, {attributes:true, attributeFilter:["class"]});

@@ -173,7 +173,7 @@
     if(!actx){
       try{ actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){}
     }
-    if(actx && actx.state==="suspended"){ try{ actx.resume(); }catch(e){} }
+    window.ApneeAudio.resume(actx);
     return actx;
   }
   // Même son « Très grave » que dans le reste de l'appli : sinus 440 Hz, extinction exponentielle.
@@ -203,7 +203,7 @@
     if(fire) beep();
   }
   function startBeeps(){
-    getCtx();
+    window.ApneeAudio.unlock(getCtx()); // débloque le son (iPhone) pendant l'appui sur GO
     lastBeepMs=0;
     if(beepTimer) clearInterval(beepTimer);
     beepTimer=setInterval(checkBeeps,50);
@@ -307,6 +307,10 @@
     persistBest();
     renderBest();
     editEl.hidden=true;
+  });
+
+  document.addEventListener("visibilitychange",function(){
+    if(!document.hidden && actx) window.ApneeAudio.resume(actx);
   });
 
   renderBest();

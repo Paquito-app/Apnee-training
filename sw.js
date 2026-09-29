@@ -1,12 +1,13 @@
 // Service worker : garde toute l'app en mémoire pour qu'elle marche sans réseau.
 // À chaque mise à jour de l'app, augmenter VERSION pour que les téléphones récupèrent les nouveaux fichiers.
-var VERSION = "apnee-v1";
+var VERSION = "apnee-v2";
 var FILES = [
   "./",
   "index.html",
   "manifest.webmanifest",
   "css/fonts.css",
   "css/style.css",
+  "js/audio.js",
   "js/app.js",
   "js/chrono.js",
   "js/voices.js",

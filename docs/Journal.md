@@ -11,3 +11,6 @@
 - Mise en ligne sur GitHub Pages : https://paquito-app.github.io/Apnee-training/
 - Icône de l'app (logo plongeuse) pour l'écran d'accueil et l'onglet.
 - Mode hors-ligne complet : polices intégrées, service worker `apnee-v1`, manifeste d'installation.
+- Son sur iPhone : session audio en mode « lecture » (sons même avec le bouton silencieux) et relance du son au retour dans l'app (`js/audio.js`).
+- Chrono libre : le cadran s'adapte à la hauteur de l'écran, tout tient sans défiler.
+- Service worker `apnee-v2`.
