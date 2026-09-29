@@ -3,7 +3,6 @@
 
   // ---------- storage helpers ----------
   // Données enregistrées dans le navigateur (localStorage), toutes préfixées « apnee.v1. ».
-  var KEY_PROTOCOL = "apnee.v1.protocol";
   var KEY_CONFIGS = "apnee.v1.configs";
   var KEY_PRESETS = "apnee.v1.presets";
   function loadJSON(key, fallback){
@@ -107,7 +106,7 @@
   var PREPARE_SEC = 5;
 
   var state = {
-    protocol: loadJSON(KEY_PROTOCOL, "co2"),
+    protocol: "carre", // l'app s'ouvre toujours sur la respiration carrée
     configs: loadJSON(KEY_CONFIGS, {}),
     presets: loadJSON(KEY_PRESETS, {}),
     view: "list",
@@ -893,7 +892,6 @@
     if(runEl.classList.contains("active")) stopSession();   // exercice en cours : on réinitialise
     state.protocol = btn.dataset.protocol;
     state.view = "list"; state.cur = -1;
-    saveJSON(KEY_PROTOCOL, state.protocol);
     renderTabs();
     renderSetup();
   });
