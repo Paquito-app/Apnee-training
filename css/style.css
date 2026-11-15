@@ -28,7 +28,7 @@ img{max-width:100%;}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
 /* appuis rapides sur + / − : pas de sélection de texte, pas de menu « Copier », pas de zoom au double-tap */
 body{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;}
-button, .tab, .stepper, .field{touch-action:manipulation;}
+button, .stepper, .field{touch-action:manipulation;}
 input, textarea{-webkit-user-select:text;user-select:text;-webkit-touch-callout:default;}
 body{
   background-color:var(--bg);
@@ -44,89 +44,39 @@ body{
   padding-inline:16px;
   overflow-x:hidden;
 }
-.field-group, .tabs, .preview, .ctrl-btn{
+.field-group, .preview, .ctrl-btn{
   backdrop-filter:blur(14px);
   -webkit-backdrop-filter:blur(14px);
 }
 html{height:100%;}
-/* écrans avec la photo de piscine : cadres à peine teintés (10 %), sans flou, sans bordure,
-   sans ligne ni ombre ; textes secondaires en blanc légèrement transparent pour rester lisibles */
-body[data-bg="pool"]{
-  --surface:rgba(10,16,28,.10);
-  --surface-2:rgba(10,16,28,.10);
-  --muted:rgba(255,255,255,.82);
-}
-body[data-bg="pool"] .field-group, body[data-bg="pool"] .tabs, body[data-bg="pool"] .preview, body[data-bg="pool"] .name-inp{
-  border-color:transparent;
-  backdrop-filter:none;
-  -webkit-backdrop-filter:none;
-}
-body[data-bg="pool"] .field{border-bottom-color:transparent;}
-body[data-bg="pool"] .name-inp{background:rgba(10,16,28,.30);}
-body[data-bg="pool"] .name-inp::placeholder{color:rgba(255,255,255,.7);}
-body[data-bg="pool"] .stepper button, body[data-bg="pool"] .tab.active{background:rgba(10,16,28,.62);}
-body[data-bg="pool"]{--bg-image:url(../img/piscine.jpg);}
-body[data-bg="navy"]{--bg-image:linear-gradient(180deg,#16213f 0%,#0f172d 100%);}
+body[data-bg="navy"], body[data-bg="home"]{--bg-image:linear-gradient(180deg,#16213f 0%,#0f172d 100%);}
 .mono{font-family:'JetBrains Mono',ui-monospace,Menlo,monospace;font-variant-numeric:tabular-nums;}
 
-/* ---- header ---- */
-header{
-  padding-block:clamp(8px,2.2vh,18px) clamp(6px,1.4vh,12px);
-  display:flex;
-  flex-direction:column;
-  gap:clamp(8px,1.8vh,14px);
-}
-.brand{
-  display:flex;
-  align-items:baseline;
-  gap:8px;
-}
-.brand h1{
-  font-size:19px;
-  font-weight:800;
-  letter-spacing:.01em;
-  margin:0;
-}
-.brand span{
-  color:var(--muted);
-  font-size:12px;
-  font-weight:600;
-}
-.tabs{
-  display:grid;
-  grid-template-columns:1.6fr 1fr 1fr 1fr 1fr;
-  gap:6px;
-  background:var(--surface);
-  border:1px solid var(--border);
-  border-radius:14px;
-  padding:4px;
-}
-.tab{
-  appearance:none;
-  border:0;
-  background:transparent;
-  color:var(--muted);
-  font-family:inherit;
-  font-weight:700;
-  font-size:12px;
-  letter-spacing:0;
-  padding:clamp(6px,1.2vh,10px) 2px;
-  border-radius:10px;
-  cursor:pointer;
-  transition:background .15s ease, color .15s ease;
-}
-.tab.active{
-  background:var(--surface-2);
-  color:var(--text);
-}
-.tab .sub{
-  display:block;
-  font-weight:500;
-  color:var(--muted);
-  font-size:10.5px;
-  margin-top:2px;
-}
-.tab.active .sub{color:var(--muted);}
+/* ---- page d'accueil ---- */
+#home{display:none;flex:1;flex-direction:column;width:100%;max-width:360px;margin:0 auto;padding:clamp(10px,3vh,28px) 0 0 clamp(4px,4vw,16px);position:relative;min-height:0;}
+#home.active{display:flex;}
+.home-brand{display:flex;align-items:center;gap:14px;margin:0 0 clamp(12px,2.6vh,22px);position:relative;z-index:1;}
+.home-logo{width:clamp(96px,30vw,128px);height:auto;flex:none;}
+.home-brand h1{font-family:'Baloo 2','Onest',sans-serif;font-weight:700;font-size:23px;letter-spacing:.06em;line-height:1.05;margin:0;}
+.home-sub{font-size:12px;color:rgba(255,255,255,.62);margin:4px 0 0;}
+.home-label{font-size:11px;font-weight:600;letter-spacing:.14em;color:rgba(255,255,255,.6);margin:0 0 8px 8px;position:relative;z-index:1;}
+.home-list{position:relative;z-index:1;display:flex;flex-direction:column;width:min(100%,260px);}
+/* trait vertical qui relie les numéros */
+.home-list::before{content:"";position:absolute;left:27px;top:28px;bottom:28px;width:1.5px;background:rgba(255,255,255,.2);}
+.home-item{appearance:none;border:0;background:none;color:var(--text);font-family:inherit;text-align:left;cursor:pointer;display:flex;align-items:center;gap:14px;padding:clamp(6px,1.1vh,10px) 10px;border-radius:14px;}
+.home-item:active{background:rgba(255,255,255,.09);}
+.ch-num{width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2','Onest',sans-serif;font-weight:700;font-size:16px;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.75);background:#141e3a;position:relative;z-index:1;}
+.ch-title{display:block;font-family:'Baloo 2','Onest',sans-serif;font-weight:700;font-size:18px;line-height:1.1;}
+.ch-sub{display:block;font-size:12.5px;color:rgba(255,255,255,.62);margin-top:2px;}
+/* reflets de l'eau en bas de l'accueil : seule la partie ondulée de la photo, avec un fondu très progressif vers le haut */
+.home-water{position:fixed;left:0;right:0;bottom:0;height:27vh;z-index:0;pointer-events:none;
+  background:url(../img/piscine.jpg) center top/100% auto no-repeat;
+  -webkit-mask-image:linear-gradient(to top,#000 0%,rgba(0,0,0,.92) 14%,rgba(0,0,0,.75) 30%,rgba(0,0,0,.52) 46%,rgba(0,0,0,.3) 62%,rgba(0,0,0,.13) 78%,rgba(0,0,0,.03) 92%,transparent 100%);
+  mask-image:linear-gradient(to top,#000 0%,rgba(0,0,0,.92) 14%,rgba(0,0,0,.75) 30%,rgba(0,0,0,.52) 46%,rgba(0,0,0,.3) 62%,rgba(0,0,0,.13) 78%,rgba(0,0,0,.03) 92%,transparent 100%);}
+/* en-tête d'un entraînement (page des séances) */
+.chapter-head{display:flex;align-items:center;gap:12px;}
+.chapter-head .ch-num{background:#fff;color:#16213f;border-color:#fff;}
+.chapter-head .ch-title{font-size:23px;}
 
 main{
   flex:1;
@@ -138,7 +88,7 @@ main{
 
 /* ---- setup screen ---- */
 /* tailles liées à la hauteur de l'écran : chaque page tient sans défiler */
-#setup{display:flex;flex-direction:column;gap:clamp(8px,1.8vh,16px);overflow-y:auto;}
+#setup{flex:1;min-height:0;display:flex;flex-direction:column;gap:clamp(8px,1.8vh,16px);overflow-y:auto;padding-top:clamp(8px,2vh,18px);}
 .field-group{
   background:var(--surface);
   border:1px solid var(--border);
@@ -194,31 +144,35 @@ main{
 /* réglages impossibles : message à la place de la durée, bouton Démarrer grisé */
 .preview.error{color:var(--ready);font-weight:600;line-height:1.35;}
 .start-btn.blocked{opacity:.4;}
-.presets{display:flex;flex-direction:column;gap:10px;}
-.presets button{appearance:none;font-family:inherit;cursor:pointer;}
-.preset-row{display:flex;align-items:center;gap:8px;}
-.preset-open{flex:1;text-align:left;padding:10px 0;border:0;background:none;color:#fff;font-size:18px;font-weight:500;}
-.preset-del{width:48px;height:48px;border:0;background:none;color:var(--ready);font-size:16px;font-weight:900;-webkit-text-stroke:1.2px currentColor;line-height:1;display:flex;align-items:center;justify-content:center;}
-.plus-btn{align-self:center;background:none;border:0;padding:0 24px;color:var(--effort);font-size:clamp(56px,10vh,88px);font-weight:400;line-height:1.15;margin-top:0;overflow:hidden;}
-.setup-top{display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.back-link{appearance:none;background:none;border:0;padding:4px 0;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;}
-.setup-name{font-size:15px;font-weight:700;color:var(--text);}
-.name-inp{flex:1;font-family:inherit;font-size:16px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:clamp(9px,1.6vh,14px) 16px;min-width:0;}
+/* séances enregistrées : la hauteur des lignes (--row-h) est réduite par app.js si elles sont trop nombreuses */
+.presets-list{flex:1 1 0;min-height:0;display:flex;flex-direction:column;gap:6px;overflow:hidden;--row-h:48px;--row-fs:18px;}
+.presets-list button{appearance:none;font-family:inherit;cursor:pointer;}
+.preset-row{flex:none;height:var(--row-h);display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.07);border-radius:12px;padding-left:14px;}
+.preset-open{flex:1;height:100%;text-align:left;padding:0;border:0;background:none;color:#fff;font-size:var(--row-fs);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.preset-del{width:var(--row-h);height:100%;border:0;background:none;color:var(--ready);font-size:min(16px,var(--row-fs));font-weight:900;-webkit-text-stroke:1.2px currentColor;line-height:1;display:flex;align-items:center;justify-content:center;}
+.plus-btn{appearance:none;align-self:center;background:none;border:0;padding:4px 16px;display:flex;align-items:center;gap:10px;font-family:inherit;cursor:pointer;flex:none;}
+.plus-sign{color:var(--effort);font-family:'Baloo 2','Onest',sans-serif;font-weight:700;font-size:40px;line-height:1;}
+.plus-label{color:rgba(255,255,255,.62);font-size:13px;}
+/* réglages : retour en haut, nom et réglages centrés dans l'écran */
+#setup.centered .setup-body{flex:1;display:flex;flex-direction:column;justify-content:center;gap:clamp(8px,1.8vh,16px);width:100%;max-width:440px;margin:0 auto;}
+.setup-top{display:flex;align-items:center;justify-content:center;gap:12px;}
+.back-link{appearance:none;background:none;border:0;padding:4px 0;font-family:inherit;font-size:14px;font-weight:600;color:var(--muted);cursor:pointer;align-self:flex-start;flex:none;}
+.setup-name{font-family:'Baloo 2','Onest',sans-serif;font-size:21px;font-weight:700;color:var(--text);text-align:center;}
+.name-inp{flex:1;font-family:inherit;font-size:16px;color:var(--text);background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:clamp(9px,1.6vh,14px) 16px;min-width:0;text-align:center;}
 .name-inp:focus{outline:0;border-color:var(--text);}
 .start-btn{
   appearance:none;
   border:0;
-  border-radius:16px;
-  padding:clamp(8px,1.8vh,17px) 34px;
-  align-self:center;
-  font-family:inherit;
-  font-size:15.5px;
-  font-weight:800;
-  letter-spacing:.02em;
-  color:var(--effort);
-  background:none;
+  border-radius:999px;
+  padding:clamp(9px,1.6vh,13px) 34px;
+  align-self:stretch;
+  font-family:'Baloo 2','Onest',sans-serif;
+  font-size:18px;
+  font-weight:700;
+  color:#16213f;
+  background:#fff;
   cursor:pointer;
-  margin-top:auto;
+  margin-top:clamp(4px,1vh,10px);
 }
 .start-btn:active{opacity:.85;}
 
@@ -240,7 +194,11 @@ main{
   color:var(--muted);
   letter-spacing:.03em;
 }
-.ring-wrap{position:relative;width:min(78vw,300px);height:min(78vw,300px);}
+.ring-wrap{position:relative;width:min(90vw,360px,52vh);height:min(90vw,360px,52vh);}
+/* ‹ Réglages en haut à gauche pendant la séance */
+#run{position:relative;}
+.run-back{position:absolute;top:clamp(8px,2vh,16px);left:0;}
+.chrono-back{align-self:flex-start;}
 .ring-wrap svg{position:absolute;inset:0;width:100%;height:100%;}
 .session-fg{fill:none;stroke-width:3;stroke-linecap:round;transition:stroke .25s ease;}
 .session-dot{transition:fill .25s ease;}
@@ -329,6 +287,7 @@ main{
 
 /* ---- chrono libre ---- */
 #chrono{
+  padding-top:clamp(8px,2vh,18px);
   display:none;
   flex:1;
   flex-direction:column;

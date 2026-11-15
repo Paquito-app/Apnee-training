@@ -22,6 +22,7 @@ var FILES = [
   "img/plongeur-hiit.png",
   "img/plongeur-o2.png",
   "icons/favicon.png",
+  "icons/logo-accueil.png",
   "icons/icon-180.png",
   "icons/icon-192.png",
   "icons/icon-512.png",

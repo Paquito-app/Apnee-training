@@ -45,3 +45,18 @@ Scan de nettoyage et de stabilité :
   - Table O2 : préparation 1:00, apnée initiale 1:00, augmentation +0:15, repos 1:00, 5 rounds.
 - Contrôle des réglages impossibles : si un repos CO2 tombe à 0:00 ou moins, ou si la dernière apnée O2 dépasse 10:00, un message jaune remplace la durée totale et « Démarrer » est grisé et bloqué. (Avant, le repos CO2 était discrètement ramené à 0:05.)
 - Vérifié à 375×600 : le message tient sur 2 lignes et le bouton reste à l'écran.
+
+## 15/11/2026 — 1.0 (fabrication 4)
+
+- Fin d'apnée (tables O2 et CO2) : son bois à 10 s, puis à 5, 4, 3, 2, 1 s avant la fin (600 Hz) ; à la fin, le même son plus grave (480 Hz) suivi de 7 rebonds de plus en plus faibles et sourds (sonar). Il remplace le bip de transition et la voix « respirez ».
+- Décompte vocal avant l'apnée : ajout du « 20 » (30, 20, 10, 5…1) ; toutes les voix réenregistrées, nettoyées et mises au même volume.
+- Nouveau logo (cachalots).
+
+## 16/11/2026 — 1.0 (fabrication 5)
+
+- Page d'accueil : logo, titre et liste numérotée des entraînements (Respiration carrée, Table O2, Table CO2, HIIT Cardio, Chrono libre) à la place des onglets en haut d'écran. Reflets de l'eau (haut de la photo de piscine) en bas de l'accueil, avec un fondu progressif ; fond bleu nuit sur toutes les autres pages.
+- Page « Mes séances » pour chaque entraînement (‹ Accueil) : les lignes rétrécissent quand les séances sont trop nombreuses pour tenir à l'écran.
+- Réglages : retour « ‹ Séances » en haut, nom et réglages centrés, bouton Enregistrer / Démarrer en pastille blanche.
+- Séance : bouton « ‹ Réglages » (arrête la séance), cadran agrandi ; toutes les étapes sont en décompte, y compris l'apnée (avant, le chiffre de l'apnée montait).
+- Chrono libre : retour « ‹ Accueil ».
+- Tests : séance complète dans chaque mode, sons de fin d'apnée au bon moment, toutes les pages à 375×667 et 390×844.

@@ -17,24 +17,25 @@
 </head>
 <body>
 
-<header>
-  <div class="brand">
-    <h1>Apnée Training</h1>
-    <span>Chrono d'entraînement · <span id="appVersion"></span></span>
-  </div>
-  <div class="tabs" id="tabs">
-    <button class="tab" data-protocol="carre">Respiration<span class="sub">carrée</span></button>
-    <button class="tab" data-protocol="o2">Table<span class="sub">O2</span></button>
-    <button class="tab" data-protocol="co2">Table<span class="sub">CO2</span></button>
-    <button class="tab" data-protocol="hiit">HIIT<span class="sub">Cardio</span></button>
-    <button class="tab" data-protocol="chrono">Chrono<span class="sub">Libre</span></button>
-  </div>
-</header>
-
 <main>
+  <!-- page d'accueil : logo + liste des entraînements (remplie par app.js) -->
+  <section id="home">
+    <div class="home-brand">
+      <img class="home-logo" src="icons/logo-accueil.png" alt="">
+      <div>
+        <h1>APNÉE<br>TRAINING</h1>
+        <p class="home-sub">chrono d'entraînement · <span id="appVersion"></span></p>
+      </div>
+    </div>
+    <p class="home-label">ENTRAÎNEMENTS</p>
+    <div class="home-list" id="homeList"></div>
+    <div class="home-water" aria-hidden="true"></div>
+  </section>
+
   <div id="setup"></div>
 
   <div id="run">
+    <button type="button" class="back-link run-back" id="runBackBtn">‹ Réglages</button>
     <div class="round-badge" id="roundBadge">ROUND 1 / 8</div>
     <div class="breath-phase-label mono" id="breathPhaseLabel" hidden></div>
     <div class="ring-wrap">
@@ -116,6 +117,7 @@
   </div>
 
   <div id="chrono">
+    <button type="button" class="back-link chrono-back" id="chronoBackBtn">‹ Accueil</button>
     <div class="chr-dial">
       <svg viewBox="0 0 400 400" role="img" aria-label="Cadran du chronomètre">
         <defs><clipPath id="chrSweepClip"><path id="chrSweepPath" d=""/></clipPath></defs>

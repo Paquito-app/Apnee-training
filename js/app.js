@@ -246,7 +246,8 @@
   }
 
   // ---------- DOM refs ----------
-  var tabsEl = document.getElementById("tabs");
+  var homeEl = document.getElementById("home");
+  var homeListEl = document.getElementById("homeList");
   var setupEl = document.getElementById("setup");
   var runEl = document.getElementById("run");
   var doneEl = document.getElementById("done");
@@ -433,35 +434,82 @@
     digitBelow.textContent = text;
   }
 
-  // ---------- render setup screen ----------
+  // ---------- navigation : accueil, entraînement, chrono ----------
+  // Les entraînements de la page d'accueil, dans l'ordre (numéro, titre, sous-titre).
+  var CHAPTERS = [
+    {key:"carre", title:"Respiration carrée", sub:"Inspirer, retenir, expirer"},
+    {key:"o2",    title:"Table O2",           sub:"Apnée croissante, repos fixe"},
+    {key:"co2",   title:"Table CO2",          sub:"Apnée fixe, repos décroissant"},
+    {key:"hiit",  title:"HIIT Cardio",        sub:"Effort, repos"},
+    {key:"chrono",title:"Chrono libre",       sub:"Record et bips"}
+  ];
+  function chapterOf(key){
+    for(var i = 0; i < CHAPTERS.length; i++) if(CHAPTERS[i].key === key) return {n:i+1, c:CHAPTERS[i]};
+    return null;
+  }
+
   var chronoOn = false;
   var chronoEl = document.getElementById("chrono");
-  function showChrono(on){
-    chronoOn = on;
-    chronoEl.classList.toggle("active", on);
-    if(on){
-      setupEl.classList.add("hidden");
-      runEl.classList.remove("active");
-      doneEl.classList.remove("active");
-    } else {
-      setupEl.classList.remove("hidden");
-    }
-  }
 
-  // fond photo : uniquement sur les écrans d'accueil (liste + réglages) de respiration / O2 / CO2 ;
-  // bleu nuit pendant la séance (dès « Démarrer »), à la fin, et sur HIIT / Chrono
-  function applyBg(){
-    var inSession = runEl.classList.contains("active") || doneEl.classList.contains("active");
-    var poolTab = !chronoOn && (state.protocol === "carre" || state.protocol === "o2" || state.protocol === "co2");
-    document.body.setAttribute("data-bg", (poolTab && !inSession) ? "pool" : "navy");
-  }
-
-  function renderTabs(){
-    Array.prototype.forEach.call(tabsEl.children, function(btn){
-      btn.classList.toggle("active", btn.dataset.protocol === (chronoOn ? "chrono" : state.protocol));
-    });
+  // Un seul écran visible à la fois : "home" (accueil), "setup" (séances + réglages), "chrono".
+  // La séance (#run) et l'écran de fin (#done) se superposent à "setup".
+  function showScreen(name){
+    chronoOn = (name === "chrono");
+    homeEl.classList.toggle("active", name === "home");
+    chronoEl.classList.toggle("active", chronoOn);
+    setupEl.classList.toggle("hidden", name !== "setup");
+    if(name !== "setup"){ runEl.classList.remove("active"); doneEl.classList.remove("active"); }
     applyBg();
   }
+
+  // fond : bleu nuit partout ; la photo de piscine n'apparaît qu'en bas de l'accueil
+  function applyBg(){
+    document.body.setAttribute("data-bg", homeEl.classList.contains("active") ? "home" : "navy");
+  }
+
+  function chapterHead(key){
+    var ch = chapterOf(key);
+    var head = document.createElement("div");
+    head.className = "chapter-head";
+    head.innerHTML = '<span class="ch-num">'+ch.n+'</span>' +
+      '<div><div class="ch-title">'+ch.c.title+'</div><div class="ch-sub">'+ch.c.sub+'</div></div>';
+    return head;
+  }
+
+  function buildHome(){
+    homeListEl.innerHTML = "";
+    CHAPTERS.forEach(function(ch, i){
+      var b = document.createElement("button");
+      b.type = "button"; b.className = "home-item"; b.dataset.protocol = ch.key;
+      b.innerHTML = '<span class="ch-num">'+(i+1)+'</span>' +
+        '<span><span class="ch-title">'+ch.title+'</span><span class="ch-sub">'+ch.sub+'</span></span>';
+      homeListEl.appendChild(b);
+    });
+  }
+
+  function openChapter(key){
+    if(key === "chrono"){ showScreen("chrono"); return; }
+    state.protocol = key;
+    state.view = "list"; state.cur = -1;
+    showScreen("setup");
+    renderSetup();
+  }
+
+  // Liste des séances : si elles sont trop nombreuses pour tenir dans la page, les lignes rétrécissent.
+  function fitPresets(){
+    var box = setupEl.querySelector(".presets-list");
+    if(!box) return;
+    var rows = box.children, n = rows.length;
+    if(!n) return;
+    var gap = 6;
+    box.style.setProperty("--row-h", "48px");
+    var avail = box.clientHeight;
+    if(avail <= 0) return;
+    var h = Math.max(24, Math.min(48, Math.floor((avail - gap * (n - 1)) / n)));
+    box.style.setProperty("--row-h", h + "px");
+    box.style.setProperty("--row-fs", Math.max(12, Math.min(18, Math.round(h * 0.38))) + "px");
+  }
+  window.addEventListener("resize", fitPresets);
 
   function totalDuration(protoKey, cfg){
     var seq = PROTOCOLS[protoKey].build(cfg);
@@ -485,8 +533,17 @@
 
     // ----- liste : séances enregistrées + bouton + -----
     if(state.view === "list"){
+      setupEl.classList.remove("centered");
+      var home = document.createElement("button");
+      home.type = "button"; home.className = "back-link"; home.textContent = "‹ Accueil";
+      home.addEventListener("click", function(){ showScreen("home"); });
+      setupEl.appendChild(home);
+      setupEl.appendChild(chapterHead(key));
+      var lbl = document.createElement("p");
+      lbl.className = "home-label"; lbl.textContent = "MES SÉANCES";
+      setupEl.appendChild(lbl);
       var col = document.createElement("div");
-      col.className = "presets";
+      col.className = "presets-list";
       list.forEach(function(pr, i){
         var row = document.createElement("div");
         row.className = "preset-row";
@@ -509,37 +566,41 @@
         row.appendChild(open); row.appendChild(del);
         col.appendChild(row);
       });
+      setupEl.appendChild(col);
       var add = document.createElement("button");
-      add.type = "button"; add.className = "plus-btn"; add.textContent = "+";
-      add.setAttribute("aria-label","Nouvelle séance");
+      add.type = "button"; add.className = "plus-btn";
+      add.innerHTML = '<span class="plus-sign">+</span><span class="plus-label">Nouvelle séance</span>';
       add.addEventListener("click", function(){
         state.configs[key] = defaultsFor(key);
         state.cur = -1; state.view = "new"; renderSetup();
       });
-      col.appendChild(add);
-      setupEl.appendChild(col);
+      setupEl.appendChild(add);
+      fitPresets();
       return;
     }
 
-    // ----- barre du haut : retour (+ nom) -----
-    var top = document.createElement("div");
-    top.className = "setup-top";
+    // ----- retour en haut, puis nom + réglages centrés dans l'écran -----
+    setupEl.classList.add("centered");
     var back = document.createElement("button");
     back.type = "button"; back.className = "back-link"; back.textContent = "‹ Séances";
     back.addEventListener("click", function(){ state.view = "list"; renderSetup(); });
-    top.appendChild(back);
+    setupEl.appendChild(back);
+    var body = document.createElement("div");
+    body.className = "setup-body";
+    var top = document.createElement("div");
+    top.className = "setup-top";
     var nameInp = null;
     if(state.view === "new"){
       nameInp = document.createElement("input");
       nameInp.type = "text"; nameInp.maxLength = 24; nameInp.placeholder = "Nom de la séance";
       nameInp.className = "name-inp"; nameInp.setAttribute("aria-label","Nom de la séance");
-      top.appendChild(nameInp); // sur la même ligne que « ‹ Séances » : gain de hauteur
+      top.appendChild(nameInp);
     } else {
       var ttl = document.createElement("div");
       ttl.className = "setup-name"; ttl.textContent = list[state.cur] ? list[state.cur].name : "";
       top.appendChild(ttl);
     }
-    setupEl.appendChild(top);
+    body.appendChild(top);
 
     var group = document.createElement("div");
     group.className = "field-group";
@@ -555,12 +616,12 @@
         '</div>';
       group.appendChild(row);
     });
-    setupEl.appendChild(group);
+    body.appendChild(group);
 
     var preview = document.createElement("div");
     preview.className = "preview";
     preview.id = "previewLine";
-    setupEl.appendChild(preview);
+    body.appendChild(preview);
 
     var startBtn = document.createElement("button");
     startBtn.className = "start-btn";
@@ -578,7 +639,8 @@
       startBtn.textContent = "Démarrer";
       startBtn.addEventListener("click", startSession);
     }
-    setupEl.appendChild(startBtn);
+    body.appendChild(startBtn);
+    setupEl.appendChild(body);
 
     updateValues();
   }
@@ -703,8 +765,7 @@
       renderPosMarks(0, PHASE_COLORS[ph.type]);
       digitUnsweptEl.setAttribute("fill", PHASE_COLORS[ph.type]);
       secLabelUnsweptEl.setAttribute("fill", PHASE_COLORS[ph.type]);
-      var isCountUp = proto.kind === "apnea" && ph.type === "hold";
-      var initialSec = String(isCountUp ? 0 : Math.ceil(Math.min(ph.dur, 60)));
+      var initialSec = String(Math.ceil(Math.min(ph.dur, 60)));   // décompte : temps restant
       digitUnsweptEl.textContent = initialSec;
       digitSweptEl.textContent = initialSec;
       setDigitClip(0);
@@ -762,18 +823,18 @@
     } else {
       // Dial logic: a phase of 60s or less fills over its own full duration; a longer phase
       // loops every 60s and advances the minute markers each time a lap completes.
-      var isCountUp = proto.kind === "apnea" && ph.type === "hold";
+      // Décompte pour toutes les étapes (préparation, apnée, repos, récupération).
       var lapFrac, digitSec, minuteCount, lapElapsedMs, lapTotalMs;
       if(ph.dur <= 60){
         lapFrac = ph.dur > 0 ? elapsed / ph.dur : 1;
-        digitSec = isCountUp ? Math.floor(elapsed) : Math.ceil(remaining);
+        digitSec = Math.ceil(remaining);
         minuteCount = 0;
         lapElapsedMs = elapsed * 1000;
         lapTotalMs = ph.dur * 1000;
       } else {
         var mod = elapsed % 60;
         lapFrac = mod / 60;
-        digitSec = isCountUp ? Math.floor(mod) : Math.ceil(Math.min(remaining, 60 - mod));
+        digitSec = Math.ceil(Math.min(remaining, 60 - mod));
         minuteCount = Math.floor(elapsed / 60);
         lapElapsedMs = mod * 1000;
         lapTotalMs = 60000;
@@ -892,23 +953,13 @@
   }
 
   // ---------- events ----------
-  tabsEl.addEventListener("click", function(e){
-    var btn = e.target.closest(".tab");
-    if(!btn) return;
-    if(btn.dataset.protocol === "chrono"){
-      if(runEl.classList.contains("active")) stopSession();
-      showChrono(true);
-      renderTabs();
-      return;
-    }
-    if(chronoOn) showChrono(false);
-    if(runEl.classList.contains("active")) stopSession();   // exercice en cours : on réinitialise
-    if(doneEl.classList.contains("active")){ doneEl.classList.remove("active"); setupEl.classList.remove("hidden"); }
-    state.protocol = btn.dataset.protocol;
-    state.view = "list"; state.cur = -1;
-    renderTabs();
-    renderSetup();
+  homeListEl.addEventListener("click", function(e){
+    var btn = e.target.closest(".home-item");
+    if(btn) openChapter(btn.dataset.protocol);
   });
+  // ‹ Réglages pendant la séance : arrête tout et revient aux réglages de la séance
+  document.getElementById("runBackBtn").addEventListener("click", stopSession);
+  document.getElementById("chronoBackBtn").addEventListener("click", function(){ showScreen("home"); });
 
   pauseBtn.addEventListener("click", function(){
     if(state.running) freezeSession(); // Stop : fige la séance
@@ -931,6 +982,6 @@
     bgObs.observe(runEl, {attributes:true, attributeFilter:["class"]});
     bgObs.observe(doneEl, {attributes:true, attributeFilter:["class"]});
   }catch(e){}
-  renderTabs();
-  renderSetup();
+  buildHome();
+  showScreen("home");   // l'app s'ouvre sur la page d'accueil
 })();
