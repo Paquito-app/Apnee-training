@@ -88,5 +88,72 @@
     }catch(e){}
   }
 
-  window.ApneeAudio = { unlock: unlock, resume: resume, bip: bip, finBulles: finBulles };
+  // ---------- Fin d'apnée : son bois (marimba) ----------
+  // Bip à 10 s puis 5, 4, 3, 2, 1 s avant la fin : 600 Hz.
+  // À 0 s : le même son à 480 Hz, suivi de 7 rebonds de plus en plus faibles et sourds (sonar).
+  var BOIS_VOL = 0.3, noiseBuf = null, sonarBus = null, sonarSrc = [];
+
+  // Bruit très court pour la frappe de la mailloche.
+  function noise(ctx){
+    if(!noiseBuf || noiseBuf.sampleRate !== ctx.sampleRate){
+      noiseBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.04), ctx.sampleRate);
+      var d = noiseBuf.getChannelData(0);
+      for(var i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+    }
+    return noiseBuf;
+  }
+
+  // Une note de bois : note de base (0,35 s), harmonique 4× très brève, frappe boisée.
+  function bois(ctx, out, freq, t, vol, cutoff, list){
+    var f = ctx.createBiquadFilter();
+    f.type = "lowpass"; f.frequency.value = Math.min(cutoff, 5000); f.Q.value = 0.5;
+    f.connect(out);
+    [[1, 1, 0.35], [4, 0.08, 0.04]].forEach(function(p){
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "sine"; o.frequency.value = freq * p[0];
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(vol * p[1], t + 0.004);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + p[2]);
+      o.connect(g); g.connect(f);
+      o.start(t); o.stop(t + p[2] + 0.05);
+      if(list) list.push(o);
+    });
+    var n = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), ng = ctx.createGain();
+    n.buffer = noise(ctx);
+    bp.type = "bandpass"; bp.frequency.value = freq * 1.6; bp.Q.value = 3;
+    ng.gain.setValueAtTime(vol * 0.5, t);
+    ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.035);
+    n.connect(bp); bp.connect(ng); ng.connect(f);
+    n.start(t);
+    if(list) list.push(n);
+  }
+
+  function bipApnee(ctx){
+    if(!ctx) return;
+    try{ bois(ctx, ctx.destination, 600, ctx.currentTime + 0.01, BOIS_VOL, 20000); }catch(e){}
+  }
+
+  function finApnee(ctx){
+    if(!ctx) return;
+    try{
+      stopFinApnee();
+      sonarBus = ctx.createGain();
+      sonarBus.connect(ctx.destination);
+      var t = ctx.currentTime + 0.01;
+      bois(ctx, sonarBus, 480, t, BOIS_VOL, 20000, sonarSrc);
+      for(var k = 1; k <= 7; k++){
+        bois(ctx, sonarBus, 480, t + k * 0.55, BOIS_VOL * Math.pow(0.75, k), 1200 - k * 120, sonarSrc);
+      }
+    }catch(e){}
+  }
+
+  // Coupe les rebonds encore à venir (Stop, Réinitialiser).
+  function stopFinApnee(){
+    try{ if(sonarBus) sonarBus.gain.setTargetAtTime(0, sonarBus.context.currentTime, 0.01); }catch(e){}
+    sonarSrc.forEach(function(s){ try{ s.stop(); }catch(e){} });
+    sonarSrc = []; sonarBus = null;
+  }
+
+  window.ApneeAudio = { unlock: unlock, resume: resume, bip: bip, finBulles: finBulles,
+    bipApnee: bipApnee, finApnee: finApnee, stopFinApnee: stopFinApnee };
 })();

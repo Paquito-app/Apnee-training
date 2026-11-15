@@ -171,6 +171,7 @@
   function tickBeep(){ beep(); buzz(40); }
   function transitionBeep(){ beep(); buzz(100); }
   function minuteBeep(){ beep(); buzz(150); }
+  function apneaBeep(){ window.ApneeAudio.bipApnee(getCtx()); buzz(40); }   // fin d'apnée : 10, 5, 4, 3, 2, 1 s
 
   var voices = [];
   function loadVoices(){ try{ voices = speechSynthesis.getVoices(); }catch(e){} }
@@ -646,7 +647,11 @@
 
   function advancePhase(){
     var prevPh = state.sequence[state.idx];
-    if(prevPh && prevPh.type === "hold" && PROTOCOLS[state.protocol].kind === "apnea") playVoice("respirez");
+    var apresApnee = prevPh && prevPh.type === "hold" && PROTOCOLS[state.protocol].kind === "apnea";
+    if(apresApnee){
+      window.ApneeAudio.finApnee(getCtx());   // fin de l'apnée : bois 480 Hz + 7 rebonds (sonar)
+      buzz(100);
+    }
     state.idx++;
     if(state.idx >= state.sequence.length){
       finishSession();
@@ -660,7 +665,7 @@
     if(proto.kind === "apnea" && ph.type === "hold"){
       playVoice("top");
     }
-    transitionBeep();
+    if(!apresApnee) transitionBeep();   // après une apnée, le son de fin remplace le bip de transition
     renderPhase();
   }
 
@@ -795,7 +800,7 @@
 
       if(minuteCount !== state.lastMinuteCount){
         renderPosMarks(minuteCount, PHASE_COLORS[ph.type]);
-        if(minuteCount > 0 && proto.kind === "apnea" && ph.type === "hold") minuteBeep();
+        if(minuteCount > 0 && proto.kind === "apnea" && ph.type === "hold" && remaining > 10.5) minuteBeep();   // pas de bip de minute pendant le décompte de fin
         state.lastMinuteCount = minuteCount;
       }
 
@@ -812,8 +817,8 @@
     if(proto.kind === "breath"){
       // no per-second tick in breath mode — only the phase-change beep (advancePhase) plays
     } else if(isApnea && ph.type !== "hold" && leadsIntoHold){
-      // décompte vocal avant une apnée : 30, 10, puis 5-1
-      var vAt = [30, 10, 5, 4, 3, 2, 1];
+      // décompte vocal avant une apnée : 30, 20, 10, puis 5-1
+      var vAt = [30, 20, 10, 5, 4, 3, 2, 1];
       for(var vi = 0; vi < vAt.length; vi++){
         var vv = vAt[vi], vk = "v" + vv;
         // le mot démarre exactement quand le chiffre affiché passe à vv
@@ -822,7 +827,17 @@
           playVoice(String(vv));
         }
       }
-    } else if(!(isApnea && ph.type === "hold")){   // pendant l'apnée : seulement le bip de chaque minute (plus haut)
+    } else if(isApnea && ph.type === "hold"){
+      // fin d'apnée : un bip à 10 s, puis à 5, 4, 3, 2, 1 s (la fin sonar part dans advancePhase)
+      var fAt = [10, 5, 4, 3, 2, 1];
+      for(var fi = 0; fi < fAt.length; fi++){
+        var fs = fAt[fi], fk = "f" + fs;
+        if(!state.beepedAt[fk] && ph.dur > fs && remaining <= fs){
+          state.beepedAt[fk] = true;
+          if(remaining > fs - 0.5) apneaBeep();   // pas de rattrapage groupé au retour dans l'app
+        }
+      }
+    } else {
       if(rem <= 3 && rem >= 1 && !state.beepedAt[rem]){
         state.beepedAt[rem] = true;
         tickBeep();
@@ -858,6 +873,7 @@
 
   function stopSession(){
     state.running = false;
+    window.ApneeAudio.stopFinApnee();
     if(state.raf) cancelAnimationFrame(state.raf);
     releaseWake();
     stopVoices(); if("speechSynthesis" in window){ try{ speechSynthesis.cancel(); }catch(e){} }
@@ -868,6 +884,7 @@
   // Stop : fige la séance à l'écran ; le bouton devient « Réinitialiser ».
   function freezeSession(){
     state.running = false;
+    window.ApneeAudio.stopFinApnee();
     if(state.raf) cancelAnimationFrame(state.raf);
     pauseBtn.textContent = "Réinitialiser";
     releaseWake();
