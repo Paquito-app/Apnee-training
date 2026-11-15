@@ -37,7 +37,7 @@ Apnée fixe, repos qui raccourcit (minimum 0:05).
 | Récupération finale | 1:00 | 0:05 – 5:00 |
 | Rounds | 8 | 1 – 20 |
 
-Tables O2 et CO2 : voix « 30, 10, 5, 4, 3, 2, 1 » avant chaque apnée, « Top » au départ, « Respirez » à la fin, bip à chaque minute d'apnée, bips sur les 3 dernières secondes des autres étapes.
+Tables O2 et CO2 : voix « 30, 20, 10, 5, 4, 3, 2, 1 » avant chaque apnée, « Top » au départ, bip à chaque minute d'apnée, son bois à 10 s puis 5, 4, 3, 2, 1 s avant la fin de l'apnée, et à la fin le même son plus grave suivi de 7 rebonds (sonar), bips sur les 3 dernières secondes des autres étapes.
 
 ## Sons
 - Un seul bip dans toute l'app : court et aigu (880 Hz).
