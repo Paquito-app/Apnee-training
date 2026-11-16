@@ -39,22 +39,11 @@
     try{ if(ctx && ctx.state !== "running") ctx.resume(); }catch(e){}
   }
 
-  // Le bip unique de l'app : sinus 880 Hz, 90 ms (celui des 3 dernières secondes).
+  // Le bip de l'app (changements d'étape, 3 dernières secondes, minutes, chrono libre,
+  // décompte de fin d'apnée) : bloc de bois aigu, voir blocBois() plus bas.
   function bip(ctx, delay){
     if(!ctx) return;
-    try{
-      var t0 = ctx.currentTime + (delay||0);
-      var osc = ctx.createOscillator();
-      var gain = ctx.createGain();
-      osc.type = "sine";
-      osc.frequency.value = 880;
-      gain.gain.setValueAtTime(0, t0);
-      gain.gain.linearRampToValueAtTime(0.15, t0+0.02);
-      gain.gain.linearRampToValueAtTime(0, t0+0.09);
-      osc.connect(gain).connect(ctx.destination);
-      osc.start(t0);
-      osc.stop(t0+0.11);
-    }catch(e){}
+    try{ blocBois(ctx, ctx.destination, BLOC_HAUT, ctx.currentTime + 0.01 + (delay||0), BLOC_VOL, 20000, null, null); }catch(e){}
   }
 
   // Une bulle : sinus dont la fréquence monte vite (la bulle rétrécit en remontant).
@@ -88,50 +77,76 @@
     }catch(e){}
   }
 
-  // ---------- Fin d'apnée : son bois (marimba) ----------
-  // Bip à 10 s puis 5, 4, 3, 2, 1 s avant la fin : 600 Hz.
-  // À 0 s : le même son à 480 Hz, suivi de 7 rebonds de plus en plus faibles et sourds (sonar).
-  var BOIS_VOL = 0.3, noiseBuf = null, sonarBus = null, sonarSrc = [];
+  // ---------- Blocs de bois (bips et fin d'apnée) ----------
+  // Bloc aigu 720 Hz pour tous les bips. À la fin d'apnée : bloc grave 560 Hz,
+  // 5 rebonds (tous les 0,16 s, de plus en plus faibles et sourds) et réverbération légère à queue longue (1,9 s).
+  var BLOC_HAUT = 720, BLOC_BAS = 560, BLOC_VOL = 0.3;
+  var BLOC_DEC = 0.13, BLOC_MODE = 2.9, BLOC_CLICK = 0.35, BLOC_Q = 7;
+  var REBONDS = 5, REBOND_PAS = 0.16;
+  var noiseBuf = null, irCache = {}, sonarBus = null, sonarSrc = [];
 
-  // Bruit très court pour la frappe de la mailloche.
+  // Bruit très court : la frappe sur le bloc.
   function noise(ctx){
     if(!noiseBuf || noiseBuf.sampleRate !== ctx.sampleRate){
-      noiseBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.04), ctx.sampleRate);
+      noiseBuf = ctx.createBuffer(1, Math.floor(ctx.sampleRate * 0.03), ctx.sampleRate);
       var d = noiseBuf.getChannelData(0);
-      for(var i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 4);
+      for(var i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / d.length, 6);
     }
     return noiseBuf;
   }
 
-  // Une note de bois : note de base (0,35 s), harmonique 4× très brève, frappe boisée.
-  function bois(ctx, out, freq, t, vol, cutoff, list){
+  // Réverbération synthétique (bruit qui décroît), mise en cache par durée.
+  function salle(ctx, out, dur, wet, lp){
+    var key = dur + "@" + ctx.sampleRate, ir = irCache[key];
+    if(!ir){
+      var n = Math.floor(ctx.sampleRate * dur), att = Math.floor(ctx.sampleRate * 0.012);
+      ir = ctx.createBuffer(2, n, ctx.sampleRate);
+      for(var c = 0; c < 2; c++){
+        var d = ir.getChannelData(c);
+        for(var i = 0; i < n; i++) d[i] = (Math.random() * 2 - 1) * Math.exp(-6.9 * i / n) * (i < att ? i / att : 1);
+      }
+      irCache[key] = ir;
+    }
+    var cv = ctx.createConvolver(), f = ctx.createBiquadFilter(), g = ctx.createGain();
+    cv.buffer = ir;
+    f.type = "lowpass"; f.frequency.value = lp;
+    g.gain.value = wet;
+    cv.connect(f); f.connect(g); g.connect(out);
+    return cv;
+  }
+
+  // Une frappe : note de base qui retombe légèrement, 2e mode à ×2,9, bruit de frappe,
+  // petite pièce (0,35 s) ; « envoi » = réverbération en plus (fin d'apnée).
+  function blocBois(ctx, out, freq, t, vol, cutoff, envoi, list){
     var f = ctx.createBiquadFilter();
-    f.type = "lowpass"; f.frequency.value = Math.min(cutoff, 5000); f.Q.value = 0.5;
+    f.type = "lowpass"; f.frequency.value = Math.min(cutoff, 9000); f.Q.value = 0.5;
     f.connect(out);
-    [[1, 1, 0.35], [4, 0.08, 0.04]].forEach(function(p){
+    f.connect(salle(ctx, out, 0.35, 0.12, 6000));
+    if(envoi) f.connect(envoi);
+    [[1, 1, BLOC_DEC], [BLOC_MODE, 0.32, BLOC_DEC * 0.45]].forEach(function(p){
       var o = ctx.createOscillator(), g = ctx.createGain();
-      o.type = "sine"; o.frequency.value = freq * p[0];
+      o.type = "sine";
+      o.frequency.setValueAtTime(freq * p[0] * 1.04, t);
+      o.frequency.exponentialRampToValueAtTime(freq * p[0], t + 0.012);
       g.gain.setValueAtTime(0.0001, t);
-      g.gain.linearRampToValueAtTime(vol * p[1], t + 0.004);
+      g.gain.linearRampToValueAtTime(vol * p[1], t + 0.0015);
       g.gain.exponentialRampToValueAtTime(0.0001, t + p[2]);
       o.connect(g); g.connect(f);
-      o.start(t); o.stop(t + p[2] + 0.05);
+      o.start(t); o.stop(t + p[2] + 0.03);
       if(list) list.push(o);
     });
     var n = ctx.createBufferSource(), bp = ctx.createBiquadFilter(), ng = ctx.createGain();
     n.buffer = noise(ctx);
-    bp.type = "bandpass"; bp.frequency.value = freq * 1.6; bp.Q.value = 3;
-    ng.gain.setValueAtTime(vol * 0.5, t);
-    ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.035);
+    bp.type = "bandpass"; bp.frequency.value = freq * 1.3; bp.Q.value = BLOC_Q;
+    ng.gain.setValueAtTime(vol * BLOC_CLICK * 3, t);
+    ng.gain.exponentialRampToValueAtTime(0.0001, t + 0.025);
     n.connect(bp); bp.connect(ng); ng.connect(f);
     n.start(t);
     if(list) list.push(n);
   }
 
-  function bipApnee(ctx){
-    if(!ctx) return;
-    try{ bois(ctx, ctx.destination, 600, ctx.currentTime + 0.01, BOIS_VOL, 20000); }catch(e){}
-  }
+  // Décompte de fin d'apnée (10, 5, 4, 3, 2, 1 s) : le même bip que partout.
+  function bipApnee(ctx){ bip(ctx, 0); }
 
   function finApnee(ctx){
     if(!ctx) return;
@@ -140,14 +155,17 @@
       sonarBus = ctx.createGain();
       sonarBus.connect(ctx.destination);
       var t = ctx.currentTime + 0.01;
-      bois(ctx, sonarBus, 480, t, BOIS_VOL, 20000, sonarSrc);
-      for(var k = 1; k <= 7; k++){
-        bois(ctx, sonarBus, 480, t + k * 0.55, BOIS_VOL * Math.pow(0.75, k), 1200 - k * 120, sonarSrc);
+      var reverb = salle(ctx, sonarBus, 1.9, 0.22, 3400);
+      blocBois(ctx, sonarBus, BLOC_BAS, t, BLOC_VOL, 20000, reverb, sonarSrc);
+      var att = Math.pow(0.04, 1 / REBONDS);   // le dernier rebond tombe à 4 % du volume
+      for(var k = 1; k <= REBONDS; k++){
+        blocBois(ctx, sonarBus, BLOC_BAS, t + k * REBOND_PAS, BLOC_VOL * Math.pow(att, k),
+                 Math.max(900, 4500 - k * (3400 / REBONDS)), reverb, sonarSrc);
       }
     }catch(e){}
   }
 
-  // Coupe les rebonds encore à venir (Stop, Réinitialiser).
+  // Coupe les rebonds et la réverbération encore en cours (Stop, ‹ Réglages).
   function stopFinApnee(){
     try{ if(sonarBus) sonarBus.gain.setTargetAtTime(0, sonarBus.context.currentTime, 0.01); }catch(e){}
     sonarSrc.forEach(function(s){ try{ s.stop(); }catch(e){} });

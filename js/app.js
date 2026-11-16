@@ -464,8 +464,40 @@
 
   // fond : bleu nuit partout ; la photo de piscine n'apparaît qu'en bas de l'accueil
   function applyBg(){
-    document.body.setAttribute("data-bg", homeEl.classList.contains("active") ? "home" : "navy");
+    var home = homeEl.classList.contains("active");
+    document.body.setAttribute("data-bg", home ? "home" : "navy");
+    if(home) placeWater();
   }
+
+  // Reflets de l'eau de l'accueil : le fondu est incliné, l'eau remonte à droite jusqu'au niveau
+  // de « HIIT Cardio » et devient transparente à gauche juste sous « Chrono libre ».
+  var WATER_STOPS = [[0,1],[14,.92],[30,.75],[46,.52],[62,.3],[78,.13],[92,.03],[100,0]];
+  function placeWater(){
+    var water = homeEl.querySelector(".home-water"), items = homeListEl.children;
+    if(!water || items.length < 5) return;
+    var W = window.innerWidth, Hwin = window.innerHeight;
+    var hiit = items[3].getBoundingClientRect(), last = items[4].getBoundingClientRect();
+    var top = Math.round(hiit.top + hiit.height * 0.2);      // haut de l'eau, côté droit
+    var H = Math.max(80, Hwin - top);
+    var D = Math.max(20, Math.min(H - 20, last.bottom - top)); // fin du fondu, côté gauche
+    // direction du fondu : perpendiculaire à la ligne qui va de (W, 0) à (0, D)
+    var nx = -D, ny = -W, n = Math.sqrt(nx*nx + ny*ny); nx /= n; ny /= n;
+    var angle = (Math.atan2(nx, -ny) * 180 / Math.PI + 360) % 360;
+    var L = Math.abs(W * nx) + Math.abs(H * ny);
+    function pos(x, y){ return 0.5 + ((x - W/2) * nx + (y - H/2) * ny) / L; }
+    var p0 = Math.min(pos(0, H), pos(W, H)), p1 = pos(W, 0);
+    var mask = "linear-gradient(" + angle.toFixed(2) + "deg," + WATER_STOPS.map(function(s){
+      return "rgba(0,0,0," + s[1] + ") " + ((p0 + (p1 - p0) * s[0] / 100) * 100).toFixed(1) + "%";
+    }).join(",") + ")";
+    water.style.height = H + "px";
+    // seule la partie ondulée de la photo (65 % du haut de l'image, 1200 × 1600) doit apparaître
+    water.style.backgroundSize = Math.max(W * 1.18, H * 1.21) + "px auto";
+    water.style.webkitMaskImage = mask;
+    water.style.maskImage = mask;
+  }
+  window.addEventListener("resize", function(){ if(homeEl.classList.contains("active")) placeWater(); });
+  // les polices peuvent décaler la liste une fois chargées : on recalcule à ce moment-là
+  if(document.fonts && document.fonts.ready) document.fonts.ready.then(function(){ if(homeEl.classList.contains("active")) placeWater(); });
 
   function chapterHead(key){
     var ch = chapterOf(key);
@@ -711,7 +743,7 @@
     var prevPh = state.sequence[state.idx];
     var apresApnee = prevPh && prevPh.type === "hold" && PROTOCOLS[state.protocol].kind === "apnea";
     if(apresApnee){
-      window.ApneeAudio.finApnee(getCtx());   // fin de l'apnée : bois 480 Hz + 7 rebonds (sonar)
+      window.ApneeAudio.finApnee(getCtx());   // fin de l'apnée : bloc grave + 5 rebonds + réverbération
       buzz(100);
     }
     state.idx++;

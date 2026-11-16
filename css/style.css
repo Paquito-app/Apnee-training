@@ -68,7 +68,10 @@ body[data-bg="navy"], body[data-bg="home"]{--bg-image:linear-gradient(180deg,#16
 .ch-num{width:34px;height:34px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2','Onest',sans-serif;font-weight:700;font-size:16px;border:1.5px solid rgba(255,255,255,.3);color:rgba(255,255,255,.75);background:#141e3a;position:relative;z-index:1;}
 .ch-title{display:block;font-family:'Baloo 2','Onest',sans-serif;font-weight:700;font-size:18px;line-height:1.1;}
 .ch-sub{display:block;font-size:12.5px;color:rgba(255,255,255,.62);margin-top:2px;}
-/* reflets de l'eau en bas de l'accueil : seule la partie ondulée de la photo, avec un fondu très progressif vers le haut */
+/* reflets de l'eau en bas de l'accueil : seule la partie ondulée de la photo, avec un fondu très progressif vers le haut.
+   app.js (placeWater) ajuste la hauteur et incline le fondu : l'eau remonte à droite jusqu'au niveau de « HIIT Cardio »
+   et s'efface à gauche juste sous « Chrono libre ». Les valeurs ci-dessous servent si ce calcul n'a pas lieu. */
+.home-copy{position:fixed;right:max(14px,env(safe-area-inset-right));bottom:max(10px,env(safe-area-inset-bottom));z-index:1;margin:0;font-size:12px;color:rgba(255,255,255,.72);pointer-events:none;}
 .home-water{position:fixed;left:0;right:0;bottom:0;height:27vh;z-index:0;pointer-events:none;
   background:url(../img/piscine.jpg) center top/100% auto no-repeat;
   -webkit-mask-image:linear-gradient(to top,#000 0%,rgba(0,0,0,.92) 14%,rgba(0,0,0,.75) 30%,rgba(0,0,0,.52) 46%,rgba(0,0,0,.3) 62%,rgba(0,0,0,.13) 78%,rgba(0,0,0,.03) 92%,transparent 100%);

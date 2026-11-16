@@ -60,3 +60,10 @@ Scan de nettoyage et de stabilité :
 - Séance : bouton « ‹ Réglages » (arrête la séance), cadran agrandi ; toutes les étapes sont en décompte, y compris l'apnée (avant, le chiffre de l'apnée montait).
 - Chrono libre : retour « ‹ Accueil ».
 - Tests : séance complète dans chaque mode, sons de fin d'apnée au bon moment, toutes les pages à 375×667 et 390×844.
+
+## 16/11/2026 — 1.0 (fabrication 6)
+
+- Bips : tous les bips de l'app (changements d'étape, 3 dernières secondes, minutes, chrono libre, décompte de fin d'apnée) deviennent un bloc de bois aigu (720 Hz), recréé en synthèse d'après les blocs de GarageBand.
+- Fin d'apnée : bloc de bois grave (560 Hz) suivi de 5 rebonds rapprochés (tous les 0,16 s) et d'une réverbération légère à queue longue (1,9 s), au lieu des 7 rebonds espacés.
+- Accueil : les reflets de l'eau remontent en biais vers la droite jusqu'au niveau de « HIIT Cardio » et s'effacent à gauche sous « Chrono libre » (calculé selon la taille de l'écran) ; mention « ©Paquito Couet » en bas à droite.
+- Tests : accueil à 375×667, 390×844 et 430×932 ; sons rendus sans erreur et au bon moment pendant une table CO2.
