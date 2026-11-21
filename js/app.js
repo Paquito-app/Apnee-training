@@ -156,6 +156,13 @@
     var m = Math.floor(sec/60), s = sec%60;
     return m + ":" + (s<10?"0":"") + s;
   }
+  // Taille du chiffre central du cadran selon le nombre de caractères affichés
+  // (2 chiffres : taille normale ; 3-4 : réduite ; "10:00" etc. : encore plus petite).
+  function digitFontSize(str){
+    if(str.length >= 5) return "44px";
+    if(str.length >= 3) return "56px";
+    return "";
+  }
 
   // ---------- audio ----------
   var actx = null;
@@ -800,7 +807,7 @@
       secLabelUnsweptEl.setAttribute("fill", PHASE_COLORS[ph.type]);
       var isHoldPhase = proto.kind === "apnea" && ph.type === "hold";
       var initialSec = String(isHoldPhase ? 0 : Math.ceil(ph.dur));   // apnée : chrono à 0 ; sinon décompte du temps restant
-      var digitSize = ph.dur >= 100 ? "56px" : "";   // 3 chiffres : chiffre plus petit pour tenir dans le cadran
+      var digitSize = digitFontSize(initialSec);
       digitUnsweptEl.style.fontSize = digitSize;
       digitSweptEl.style.fontSize = digitSize;
       digitUnsweptEl.textContent = initialSec;
@@ -894,7 +901,11 @@
       clockDigitFadeEl.style.opacity = fadeOpacity;
       posMarksG.style.opacity = fadeOpacity;
 
-      var digitStr = String(digitSec);
+      // Apnée de plus d'une minute : affiche m:ss (1:05, 1:30…) plutôt qu'un compte de secondes brut.
+      var digitStr = (isHold && digitSec >= 60) ? fmt(digitSec) : String(digitSec);
+      var digitSize = digitFontSize(digitStr);
+      digitUnsweptEl.style.fontSize = digitSize;
+      digitSweptEl.style.fontSize = digitSize;
       digitUnsweptEl.textContent = digitStr;
       digitSweptEl.textContent = digitStr;
       setDigitClip(lapFrac);
