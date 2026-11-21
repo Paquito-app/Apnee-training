@@ -133,6 +133,7 @@
     sequence: [],
     idx: -1,
     phaseStart: 0,
+    pausedAt: 0,
     remaining: 0,
     running: false,
     totalRounds: 0,
@@ -857,20 +858,21 @@
       setWaterLevel(level);
     } else {
       // Dial logic: a phase of 60s or less fills over its own full duration; a longer phase
-      // loops every 60s and advances the minute markers each time a lap completes.
-      // Décompte pour toutes les étapes (préparation, apnée, repos, récupération).
+      // loops every 60s and advances the minute markers each time a lap completes —
+      // sauf l'apnée (hold) elle-même, qui fait toujours un seul tour sur toute sa durée
+      // (50 s, 1 min, 2 min 30…) : la vitesse du tour varie donc avec la durée, comme repère visuel.
+      var singleLap = ph.dur <= 60 || (proto.kind === "apnea" && ph.type === "hold");
       var lapFrac, digitSec, minuteCount, lapElapsedMs, lapTotalMs;
-      if(ph.dur <= 60){
+      minuteCount = Math.floor(elapsed / 60);   // sert au bip de la minute restante, indépendant du tour affiché
+      if(singleLap){
         lapFrac = ph.dur > 0 ? elapsed / ph.dur : 1;
         digitSec = Math.ceil(remaining);
-        minuteCount = 0;
         lapElapsedMs = elapsed * 1000;
         lapTotalMs = ph.dur * 1000;
       } else {
         var mod = elapsed % 60;
         lapFrac = mod / 60;
         digitSec = Math.ceil(remaining);   // décompte continu (75, 74, 73…), sans retour à 60
-        minuteCount = Math.floor(elapsed / 60);
         lapElapsedMs = mod * 1000;
         lapTotalMs = 60000;
       }
@@ -977,14 +979,26 @@
     setupEl.classList.remove("hidden");
   }
 
-  // Stop : fige la séance à l'écran ; le bouton devient « Réinitialiser ».
+  // Stop : met la séance en pause à l'écran ; le bouton devient « Reprendre ».
   function freezeSession(){
     state.running = false;
+    state.pausedAt = performance.now();
     window.ApneeAudio.stopFinApnee();
     if(state.raf) cancelAnimationFrame(state.raf);
-    pauseBtn.textContent = "Réinitialiser";
+    pauseBtn.textContent = "Reprendre";
     releaseWake();
     stopVoices(); if("speechSynthesis" in window){ try{ speechSynthesis.cancel(); }catch(e){} }
+  }
+
+  // Reprendre : continue l'exercice exactement où il s'est arrêté (pas de remise à zéro).
+  function resumeSession(){
+    var now = performance.now();
+    state.phaseStart += now - state.pausedAt;   // décale le départ de la phase du temps passé en pause
+    state.running = true;
+    pauseBtn.textContent = "Stop";
+    requestWake();
+    window.ApneeAudio.unlock(getCtx());   // re-débloque le son (iPhone) après une pause
+    state.raf = requestAnimationFrame(loop);
   }
 
   // ---------- events ----------
@@ -997,8 +1011,8 @@
   document.getElementById("chronoBackBtn").addEventListener("click", function(){ showScreen("home"); });
 
   pauseBtn.addEventListener("click", function(){
-    if(state.running) freezeSession(); // Stop : fige la séance
-    else stopSession();                // Réinitialiser : retour au réglage
+    if(state.running) freezeSession(); // Stop : met en pause
+    else resumeSession();              // Reprendre : continue sans réinitialiser
   });
   doneBackBtn.addEventListener("click", function(){
     doneEl.classList.remove("active");
