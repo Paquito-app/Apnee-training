@@ -39,11 +39,27 @@
     try{ if(ctx && ctx.state !== "running") ctx.resume(); }catch(e){}
   }
 
-  // Le bip de l'app (changements d'étape, 3 dernières secondes, minutes, chrono libre,
+  // Le bip de l'app (changements d'étape, 3 dernières secondes, chrono libre,
   // décompte de fin d'apnée) : bloc de bois aigu, voir blocBois() plus bas.
   function bip(ctx, delay){
     if(!ctx) return;
     try{ blocBois(ctx, ctx.destination, BLOC_HAUT, ctx.currentTime + 0.01 + (delay||0), BLOC_VOL, 20000, null, null); }catch(e){}
+  }
+
+  // Bip des minutes pendant l'apnée : plus grave et discret que le bip, timbre rond (triangle).
+  var BIP_MINUTE_HZ = 440, BIP_MINUTE_VOL = 0.11;
+  function bipMinute(ctx){
+    if(!ctx) return;
+    try{
+      var t = ctx.currentTime + 0.01, o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = "triangle";
+      o.frequency.value = BIP_MINUTE_HZ;
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.linearRampToValueAtTime(BIP_MINUTE_VOL, t + 0.01);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35);
+      o.connect(g); g.connect(ctx.destination);
+      o.start(t); o.stop(t + 0.4);
+    }catch(e){}
   }
 
   // Une bulle : sinus dont la fréquence monte vite (la bulle rétrécit en remontant).
@@ -172,6 +188,6 @@
     sonarSrc = []; sonarBus = null;
   }
 
-  window.ApneeAudio = { unlock: unlock, resume: resume, bip: bip, finBulles: finBulles,
+  window.ApneeAudio = { unlock: unlock, resume: resume, bip: bip, bipMinute: bipMinute, finBulles: finBulles,
     bipApnee: bipApnee, finApnee: finApnee, stopFinApnee: stopFinApnee };
 })();

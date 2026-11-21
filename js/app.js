@@ -170,7 +170,7 @@
   function buzz(p){ try{ if(navigator.vibrate) navigator.vibrate(p); }catch(e){} }
   function tickBeep(){ beep(); buzz(40); }
   function transitionBeep(){ beep(); buzz(100); }
-  function minuteBeep(){ beep(); buzz(150); }
+  function minuteBeep(){ window.ApneeAudio.bipMinute(getCtx()); buzz(150); }   // 440 Hz discret
   function apneaBeep(){ window.ApneeAudio.bipApnee(getCtx()); buzz(40); }   // fin d'apnée : 10, 5, 4, 3, 2, 1 s
 
   var voices = [];
@@ -797,7 +797,10 @@
       renderPosMarks(0, PHASE_COLORS[ph.type]);
       digitUnsweptEl.setAttribute("fill", PHASE_COLORS[ph.type]);
       secLabelUnsweptEl.setAttribute("fill", PHASE_COLORS[ph.type]);
-      var initialSec = String(Math.ceil(Math.min(ph.dur, 60)));   // décompte : temps restant
+      var initialSec = String(Math.ceil(ph.dur));   // décompte : temps restant
+      var digitSize = ph.dur >= 100 ? "56px" : "";   // 3 chiffres : chiffre plus petit pour tenir dans le cadran
+      digitUnsweptEl.style.fontSize = digitSize;
+      digitSweptEl.style.fontSize = digitSize;
       digitUnsweptEl.textContent = initialSec;
       digitSweptEl.textContent = initialSec;
       setDigitClip(0);
@@ -866,7 +869,7 @@
       } else {
         var mod = elapsed % 60;
         lapFrac = mod / 60;
-        digitSec = Math.ceil(Math.min(remaining, 60 - mod));
+        digitSec = Math.ceil(remaining);   // décompte continu (75, 74, 73…), sans retour à 60
         minuteCount = Math.floor(elapsed / 60);
         lapElapsedMs = mod * 1000;
         lapTotalMs = 60000;
