@@ -798,7 +798,8 @@
       renderPosMarks(0, PHASE_COLORS[ph.type]);
       digitUnsweptEl.setAttribute("fill", PHASE_COLORS[ph.type]);
       secLabelUnsweptEl.setAttribute("fill", PHASE_COLORS[ph.type]);
-      var initialSec = String(Math.ceil(ph.dur));   // décompte : temps restant
+      var isHoldPhase = proto.kind === "apnea" && ph.type === "hold";
+      var initialSec = String(isHoldPhase ? 0 : Math.ceil(ph.dur));   // apnée : chrono à 0 ; sinon décompte du temps restant
       var digitSize = ph.dur >= 100 ? "56px" : "";   // 3 chiffres : chiffre plus petit pour tenir dans le cadran
       digitUnsweptEl.style.fontSize = digitSize;
       digitSweptEl.style.fontSize = digitSize;
@@ -861,12 +862,14 @@
       // loops every 60s and advances the minute markers each time a lap completes —
       // sauf l'apnée (hold) elle-même, qui fait toujours un seul tour sur toute sa durée
       // (50 s, 1 min, 2 min 30…) : la vitesse du tour varie donc avec la durée, comme repère visuel.
-      var singleLap = ph.dur <= 60 || (proto.kind === "apnea" && ph.type === "hold");
+      var isHold = proto.kind === "apnea" && ph.type === "hold";
+      var singleLap = ph.dur <= 60 || isHold;
       var lapFrac, digitSec, minuteCount, lapElapsedMs, lapTotalMs;
-      minuteCount = Math.floor(elapsed / 60);   // sert au bip de la minute restante, indépendant du tour affiché
+      minuteCount = Math.floor(elapsed / 60);   // sert uniquement aux repères (pastilles), pas au bip
       if(singleLap){
         lapFrac = ph.dur > 0 ? elapsed / ph.dur : 1;
-        digitSec = Math.ceil(remaining);
+        // Apnée : chrono qui compte le temps écoulé (0, 1, 2…), pas un décompte du temps restant.
+        digitSec = isHold ? Math.floor(elapsed) : Math.ceil(remaining);
         lapElapsedMs = elapsed * 1000;
         lapTotalMs = ph.dur * 1000;
       } else {
@@ -898,8 +901,12 @@
 
       if(minuteCount !== state.lastMinuteCount){
         renderPosMarks(minuteCount, PHASE_COLORS[ph.type]);
-        if(minuteCount > 0 && proto.kind === "apnea" && ph.type === "hold" && remaining > 10.5) minuteBeep();   // pas de bip de minute pendant le décompte de fin
         state.lastMinuteCount = minuteCount;
+      }
+      // Bip quand il reste exactement 1 minute d'apnée (une seule fois), quelle que soit la durée totale.
+      if(isHold && ph.dur > 60 && !state.beepedAt.minute && remaining <= 60){
+        state.beepedAt.minute = true;
+        minuteBeep();
       }
 
       if(state.sessionTotal > 0){
