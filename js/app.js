@@ -53,7 +53,7 @@
       fields: [
         {key:"breathSec", label:"Préparation", hint:"Avant le premier round", step:5, min:15, max:300, default:60},
         {key:"holdStart", label:"Durée apnée initiale", hint:"Première apnée", step:5, min:15, max:600, default:60},
-        {key:"holdStep", label:"Augmentation temps d'apnée", hint:"Ajout à chaque round", step:5, min:5, max:60, default:15},
+        {key:"holdStep", label:"Augmentation temps d'apnée", hint:"Ajout à chaque round", step:5, min:0, max:60, default:15, zeroLabel:"Constant"},
         {key:"restSec", label:"Temps de repos", hint:"Entre chaque apnée", step:5, min:15, max:600, default:60},
         {key:"recSec", label:"Temps de récupération", hint:"Après la dernière apnée", step:5, min:5, max:300, default:60},
         {key:"rounds", label:"Rounds", hint:"Nombre de répétitions", step:1, min:1, max:20, default:5, isRounds:true}
@@ -709,7 +709,9 @@
     proto.fields.forEach(function(f){
       var el = setupEl.querySelector('[data-val="'+f.key+'"]');
       if(!el) return;
-      el.textContent = f.isRounds ? cfg[f.key] : fmt(cfg[f.key]);
+      var isWord = f.zeroLabel && cfg[f.key] === 0;
+      el.classList.toggle("val-word", !!isWord);
+      el.textContent = isWord ? f.zeroLabel : (f.isRounds ? cfg[f.key] : fmt(cfg[f.key]));
     });
     var total = totalDuration(state.protocol, cfg);
     var problem = problemFor(state.protocol, cfg);
