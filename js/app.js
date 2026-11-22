@@ -23,7 +23,7 @@
         {key:"breathSec", label:"Préparation", hint:"Avant le premier round", step:5, min:15, max:300, default:60},
         {key:"holdSec", label:"Temps d'apnée", hint:"Durée fixe à chaque round", step:5, min:15, max:600, default:60},
         {key:"restStart", label:"Temps de repos initial", hint:"Premier repos, diminue à chaque round", step:5, min:15, max:600, default:45},
-        {key:"restStep", label:"Diminution du temps de repos", hint:"Retirée à chaque round", step:5, min:5, max:60, default:10},
+        {key:"restStep", label:"Diminution du temps de repos", hint:"Retirée à chaque round", step:5, min:0, max:60, default:10, zeroLabel:"Constant"},
         {key:"recSec", label:"Temps de récupération", hint:"Après la dernière apnée", step:5, min:5, max:300, default:60},
         {key:"rounds", label:"Rounds", hint:"Nombre de répétitions", step:1, min:1, max:20, default:5, isRounds:true}
       ],
